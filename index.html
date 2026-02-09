@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Fabric of Thought: Organic & Artificial</title>
+    <title>An Essay on Consciousness by Jesse Pardue</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
             --bg-color: #f9f9f9;
             --text-color: #222;
             --accent-color: #666;
-            --interactive-bg: #e0e0e0;
             --font-serif: 'Merriweather', serif;
             --font-sans: 'Inter', sans-serif;
         }
@@ -35,9 +34,8 @@
             margin-top: 2em;
         }
 
-        h1 { font-size: 2.5rem; margin-top: 0; }
-        h2 { font-size: 1.8rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; }
-
+        h1 { font-size: 2.5rem; margin-top: 0; margin-bottom: 0.5rem; }
+        
         p {
             margin-bottom: 1.5em;
             font-size: 1.1rem;
@@ -55,8 +53,9 @@
         .subtitle {
             font-family: var(--font-sans);
             color: #666;
-            font-size: 1.2rem;
-            margin-top: 0.5rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         article {
@@ -68,7 +67,7 @@
         /* Interactive Containers */
         .interactive-module {
             margin: 3rem 0;
-            padding: 2rem;
+            padding: 0; /* Removing padding for full canvas */
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -80,28 +79,31 @@
         }
 
         .interactive-module:hover {
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             border-color: #bbb;
         }
 
         .module-label {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 15px;
+            left: 15px;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #999;
             pointer-events: none;
+            z-index: 10;
         }
 
-        /* Controls */
-        input[type=range] {
-            width: 100%;
-            margin: 1rem 0;
-            accent-color: #333;
+        .info-panel {
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            color: #555;
+            text-align: center;
+            background: #fff;
+            border-top: 1px solid #eee;
         }
-        
+
         /* 1. SCALE SIMULATION CSS */
         #scale-visual {
             height: 300px;
@@ -110,6 +112,7 @@
             justify-content: center;
             filter: grayscale(100%);
             transition: filter 0.5s ease;
+            position: relative;
         }
         
         .interactive-module:hover #scale-visual {
@@ -121,80 +124,47 @@
             transition: all 0.3s ease-out;
             position: relative;
         }
-
-        /* 2. ATP TURBINE CSS */
-        #atp-container {
-            height: 350px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        #atp-svg {
-            width: 200px;
-            height: 200px;
-            fill: #333;
-            transition: fill 0.5s ease, transform 0.1s linear;
-        }
-
-        .interactive-module:hover #atp-svg {
-            fill: #2ecc71; /* Greenish on hover */
-        }
         
-        .info-panel {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            min-height: 3em;
-            color: #555;
-            text-align: center;
+        .slider-container {
+            padding: 0 2rem 1rem 2rem;
         }
 
-        /* 3. BRAIN CSS */
+        input[type=range] {
+            width: 100%;
+            accent-color: #333;
+        }
+
+        /* 2. 3D BRAIN CSS */
         #brain-container {
-            height: 400px;
+            height: 450px;
+            width: 100%;
+            background: #f0f0f0;
+            cursor: move; /* Indicates draggable */
             position: relative;
-            display: flex;
-            justify-content: center;
-        }
-
-        #brain-svg {
-            height: 100%;
-            width: auto;
-            filter: grayscale(100%);
-            transition: filter 0.3s ease;
         }
         
-        #brain-svg:hover {
-            filter: grayscale(0%);
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
-        .brain-part {
-            fill: #e0e0e0;
-            stroke: #333;
-            stroke-width: 2;
-            cursor: pointer;
-            transition: fill 0.3s ease;
-        }
-
-        .brain-part:hover {
-            fill: var(--part-color);
-        }
-
-        #brain-tooltip {
+        #brain-overlay {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.95);
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 80%;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
             text-align: center;
-            display: none;
-            font-size: 0.9rem;
+            pointer-events: none;
+            color: #444;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .interactive-module:hover #brain-overlay {
+            opacity: 1;
+            color: #000;
         }
 
     </style>
@@ -202,8 +172,8 @@
 <body>
 
 <header>
-    <h1>The Fabric of Thought</h1>
-    <div class="subtitle">Silicon, Cells, and the Stream of Consciousness</div>
+    <h1>An Essay on Consciousness</h1>
+    <div class="subtitle">by Jesse Pardue</div>
 </header>
 
 <article>
@@ -221,7 +191,9 @@
         <div id="scale-visual">
             <div id="scale-object" class="orb"></div>
         </div>
-        <input type="range" id="scale-slider" min="0" max="100" value="0">
+        <div class="slider-container">
+            <input type="range" id="scale-slider" min="0" max="100" value="0">
+        </div>
         <div class="info-panel" id="scale-text">Drag slider to traverse the scale: The Pea.</div>
     </div>
 
@@ -235,58 +207,24 @@
 
     <p>Each part of your brain works independently. Your visual cortex working to form an image. Your auditory cortex working to form sound. Your somatosensory cortex working to form touch. Your olfactory cortex working to form your sense of smell. So on and so forth. But what are YOU? You exist and you take it all in. Back to the player piano analogy, your brain organizes all of this chaos into a legible string. Intelligence emerges.</p>
 
-    <!-- INTERACTIVE MODULE 3: THE BRAIN -->
+    <!-- INTERACTIVE MODULE 2: 3D BRAIN -->
     <div class="interactive-module">
-        <div class="module-label">Interactive Figure 2: The Organic Logic Gate</div>
+        <div class="module-label">Interactive Figure 2: The Neural Architecture</div>
         <div id="brain-container">
-            <!-- Simplified Brain SVG -->
-            <svg id="brain-svg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-                <!-- Frontal Lobe -->
-                <path class="brain-part" d="M150,150 C100,150 50,200 60,280 C70,330 150,350 180,330 L180,250 Z" 
-                      style="--part-color: #e74c3c;" data-info="Frontal Cortex: Planning, volition, and 'constraint satisfaction'. Where the 'I' decides." />
-                
-                <!-- Parietal Lobe -->
-                <path class="brain-part" d="M150,150 C180,100 280,100 320,150 L320,220 L180,220 Z" 
-                      style="--part-color: #3498db;" data-info="Parietal Lobe: Processing sensory information and spatial orientation." />
-                
-                <!-- Occipital Lobe -->
-                <path class="brain-part" d="M320,150 C380,180 390,250 350,300 L300,300 L320,220 Z" 
-                      style="--part-color: #f1c40f;" data-info="Occipital Lobe: The Visual Cortex. Converting light signals into the image of reality." />
-                
-                <!-- Temporal Lobe -->
-                <path class="brain-part" d="M180,250 C180,350 280,350 300,300 L320,220 L180,220 Z" 
-                      style="--part-color: #2ecc71;" data-info="Temporal Lobe: Auditory processing and memory encoding." />
-                
-                <!-- Cerebellum -->
-                <path class="brain-part" d="M280,310 C260,360 360,380 370,320 Z" 
-                      style="--part-color: #9b59b6;" data-info="Cerebellum: Coordination and precision. The rhythm of movement." />
-            </svg>
-            <div id="brain-tooltip">Hover over a brain region to analyze function.</div>
+            <canvas id="brain-canvas"></canvas>
+            <div id="brain-overlay">Click and Drag to Rotate &middot; The Structure of Thought</div>
         </div>
-        <div class="info-panel" style="margin-top:0">The Prefrontal Cortex translates thoughts into plans.</div>
+        <div class="info-panel" id="brain-info">
+            The Prefrontal Cortex translates thoughts into plans through "constraint satisfaction."
+        </div>
     </div>
 
     <p>We share 99.9% of our DNA with one another, what makes us unique? Is it the order of the thoughts that we have that pass through our stream of consciousness, like grains of sand falling through our fingers as we finally decide to observe one, after letting all the other fall through? Why? We are chasing our tail again, introspecting our own consciousness.</p>
 
     <p>What makes us different from an ant, if so much of us are all the same? We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness. Likely the ant has no concept of the broader good it will do while it marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
 
-    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce? Will the hydrogen ion force the ATP synthase turbine to turn, will the oxygen accept the hydrogen?</p>
-
-    <!-- INTERACTIVE MODULE 2: ATP TURBINE -->
-    <div class="interactive-module">
-        <div class="module-label">Interactive Figure 3: The Engine of Life</div>
-        <div id="atp-container">
-            <svg id="atp-svg" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="10" />
-                <path d="M50,40 L50,10 L60,10 L60,40 Z" transform="rotate(0 50 50)" />
-                <path d="M50,40 L50,10 L60,10 L60,40 Z" transform="rotate(120 50 50)" />
-                <path d="M50,40 L50,10 L60,10 L60,40 Z" transform="rotate(240 50 50)" />
-                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5"/>
-            </svg>
-        </div>
-        <div class="info-panel" id="atp-info">Click the turbine to generate energy (ATP).</div>
-    </div>
-
+    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce?</p> 
+    
     <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers?</p>
 
     <p>All marching to the same drum, observing it differently. What is so different than the electron in the transistor thirty times over in the infinite complexity of a chip, flipping bits—the beauty of the baud—to a number in a program, abstracted into a video from a million different pixels. What is it that could give rise to thought? The video seems inorganic in a way that I would say steel is; but there is a fine fabric that intertwines everything.</p>
@@ -318,10 +256,6 @@
         const val = parseInt(e.target.value);
         
         // Visual Transformation Logic
-        // 0-33: Pea (Green, Round)
-        // 34-66: Atom (Spinning, Wireframe look)
-        // 67-100: Galaxy (Swirling, White)
-
         if (val < 33) {
             // THE PEA
             scaleObject.style.width = '100px';
@@ -329,6 +263,7 @@
             scaleObject.style.backgroundColor = `rgb(${50 + val}, ${128 - val}, 50)`; // Fade green
             scaleObject.style.boxShadow = 'inset -10px -10px 20px rgba(0,0,0,0.2)';
             scaleObject.style.border = 'none';
+            scaleObject.style.borderRadius = '50%';
             scaleObject.style.transform = `scale(${1 + val/100})`;
             scaleText.innerText = "The Pea: Organic matter. Green, mushy, defined by sunlight.";
         } else if (val < 66) {
@@ -338,6 +273,7 @@
             scaleObject.style.backgroundColor = 'transparent';
             scaleObject.style.border = '2px solid #333';
             scaleObject.style.boxShadow = '0 0 0 10px rgba(0,0,0,0.1)';
+            scaleObject.style.borderRadius = '50%';
             // Simulate spin
             scaleObject.style.transform = `scale(${0.5 + val/50}) rotate(${val * 10}deg)`;
             scaleText.innerText = "The Atom: Quarks and spin. No explicit form, only probability.";
@@ -347,69 +283,217 @@
             scaleObject.style.height = '10px';
             scaleObject.style.backgroundColor = '#000';
             scaleObject.style.border = 'none';
+            scaleObject.style.borderRadius = '50%';
             // Create a "galaxy" via box shadow particles
             scaleObject.style.boxShadow = `
                 0 0 40px 20px #000,
                 20px -20px 0 0 #333,
                 -20px 20px 0 0 #666,
-                40px -40px 0 0 #999
+                40px -40px 0 0 #999,
+                60px 20px 0 0 #ccc
             `;
             scaleObject.style.transform = `scale(${val/10}) rotate(${val * 5}deg)`;
             scaleText.innerText = "The Cosmos: Systems dying and thriving. The macrocosm.";
         }
     });
 
-    // --- Interaction 2: ATP Turbine ---
-    const atpContainer = document.getElementById('atp-container');
-    const atpSvg = document.getElementById('atp-svg');
-    const atpInfo = document.getElementById('atp-info');
-    let rotation = 0;
-    let isSpinning = false;
+    // --- Interaction 2: The 3D Particle Brain ---
+    // A lightweight 3D engine using Canvas 2D
+    const canvas = document.getElementById('brain-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    
+    // Brain State
+    const particles = [];
+    const numParticles = 600;
+    let angleX = 0;
+    let angleY = 0;
+    let targetAngleX = 0;
+    let targetAngleY = 0;
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let isInteracting = false; // To track if user is hovering the module
+    
+    // Resize handler
+    function resize() {
+        width = canvas.parentElement.offsetWidth;
+        height = canvas.parentElement.offsetHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    atpContainer.addEventListener('click', () => {
-        if(!isSpinning) {
-            isSpinning = true;
-            atpInfo.innerText = "Hydrogen ions force rotation. ATP Generated. Life continues.";
-            atpInfo.style.color = "#2ecc71";
-            atpSvg.style.fill = "#2ecc71";
+    // Create Brain Geometry (Two hemispheres)
+    function createBrain() {
+        for (let i = 0; i < numParticles; i++) {
+            // Spherical coordinates
+            const theta = Math.random() * Math.PI * 2; // Azimuth
+            const phi = Math.acos((Math.random() * 2) - 1); // Elevation
             
-            const spin = setInterval(() => {
-                rotation += 10;
-                atpSvg.querySelector('g') ? null : null; // check exists
-                // Rotate the inner blades
-                const blades = atpSvg.querySelectorAll('path');
-                blades.forEach((path, index) => {
-                    path.setAttribute('transform', `rotate(${rotation + (index * 120)} 50 50)`);
-                });
-            }, 16);
+            let r = 1; 
 
-            // Stop after a few seconds
-            setTimeout(() => {
-                clearInterval(spin);
-                isSpinning = false;
-                atpInfo.innerText = "Cycle complete. Awaiting input.";
-                atpInfo.style.color = "#555";
-                atpSvg.style.fill = "#333";
-            }, 3000);
+            // Convert to Cartesian
+            let x = r * Math.sin(phi) * Math.cos(theta);
+            let y = r * Math.sin(phi) * Math.sin(theta);
+            let z = r * Math.cos(phi);
+
+            // Morph sphere into brain shape
+            // 1. Separate hemispheres (gap at x=0)
+            x += (x > 0 ? 0.1 : -0.1); 
+            
+            // 2. Scale to be oblong (longer Z)
+            z *= 1.2;
+            
+            // 3. Flatten bottom slightly
+            if(y > 0.5) y *= 0.8;
+
+            // Randomize color slightly (greyscale to colored)
+            particles.push({x, y, z, originalX: x, originalY: y, originalZ: z});
+        }
+    }
+    createBrain();
+
+    // 3D Projection Logic
+    function project(p, rotX, rotY) {
+        // Rotation Matrix Y
+        let x1 = p.x * Math.cos(rotY) - p.z * Math.sin(rotY);
+        let z1 = p.x * Math.sin(rotY) + p.z * Math.cos(rotY);
+        let y1 = p.y;
+
+        // Rotation Matrix X
+        let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+        let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+        let x2 = x1;
+
+        // Perspective Projection
+        const fov = 400;
+        const scale = fov / (fov + z2 * 100 + 300); // 300 is camera distance
+        
+        const x2d = x2 * 100 * scale + width / 2;
+        const y2d = y2 * 100 * scale + height / 2;
+
+        return { x: x2d, y: y2d, scale: scale, z: z2 };
+    }
+
+    // Animation Loop
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Smooth rotation easing
+        if (!isDragging) {
+            // Auto spin slowly if not interacting
+            targetAngleY += 0.002; 
+        }
+        
+        // Linear interpolation for smooth movement
+        angleX += (targetAngleX - angleX) * 0.1;
+        angleY += (targetAngleY - angleY) * 0.1;
+
+        // Determine style based on interaction
+        const dotColor = isInteracting ? 'rgba(50, 50, 50, 0.8)' : 'rgba(150, 150, 150, 0.5)';
+        const connectionColor = isInteracting ? 'rgba(0, 150, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)';
+        
+        // Project all points
+        const projectedPoints = particles.map(p => project(p, angleX, angleY));
+
+        // Draw Connections (Synapses) - costly, so check distance
+        ctx.beginPath();
+        ctx.strokeStyle = connectionColor;
+        ctx.lineWidth = 0.5;
+        
+        // Draw lines between close neighbors
+        for (let i = 0; i < projectedPoints.length; i++) {
+            const p1 = projectedPoints[i];
+            // Only verify a subset to save performance
+            if (i % 2 === 0) { 
+                // Draw logic: connect to nearby points in 3D space would be better, 
+                // but screen space is faster for this effect.
+                // Actually, let's just draw random connections for the "neural fabric" look
+                // Connecting p1 to p1+1 is a simple thread
+                if (i < projectedPoints.length - 1) {
+                    const p2 = projectedPoints[i+1];
+                    const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                    if (dist < 30) {
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                    }
+                }
+            }
+            
+            // Draw Point
+            ctx.fillStyle = dotColor;
+            
+            // If dragging/interacting, make points colored
+            if(isInteracting) {
+                // Color gradient based on position
+                const r = Math.floor(100 + (Math.sin(i) * 155));
+                const g = Math.floor(100 + (Math.cos(i) * 155));
+                const b = 200;
+                ctx.fillStyle = `rgba(${r},${g},${b}, ${p1.scale})`;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p1.x, p1.y, 1.5 * p1.scale, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.stroke();
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Mouse Events for Brain Interaction
+    const brainContainer = document.getElementById('brain-container');
+
+    brainContainer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        isInteracting = true; // Changes color mode
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        isInteracting = false; // Reverts color mode
+    });
+
+    brainContainer.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaX = e.clientX - lastMouseX;
+            const deltaY = e.clientY - lastMouseY;
+            
+            targetAngleY += deltaX * 0.01;
+            targetAngleX += deltaY * 0.01;
+
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
         }
     });
+    
+    // Touch support
+    brainContainer.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        lastMouseX = e.touches[0].clientX;
+        lastMouseY = e.touches[0].clientY;
+        isInteracting = true;
+    }, {passive: false});
 
-    // --- Interaction 3: The Brain ---
-    const brainParts = document.querySelectorAll('.brain-part');
-    const brainTooltip = document.getElementById('brain-tooltip');
+    brainContainer.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            const deltaX = e.touches[0].clientX - lastMouseX;
+            const deltaY = e.touches[0].clientY - lastMouseY;
+            
+            targetAngleY += deltaX * 0.01;
+            targetAngleX += deltaY * 0.01;
 
-    brainParts.forEach(part => {
-        part.addEventListener('mouseenter', (e) => {
-            const info = e.target.getAttribute('data-info');
-            brainTooltip.innerText = info;
-            brainTooltip.style.display = 'block';
-            brainTooltip.style.color = e.target.style.getPropertyValue('--part-color');
-        });
-
-        part.addEventListener('mouseleave', () => {
-            brainTooltip.style.display = 'none';
-        });
-    });
+            lastMouseX = e.touches[0].clientX;
+            lastMouseY = e.touches[0].clientY;
+            e.preventDefault(); // Prevent scrolling while rotating
+        }
+    }, {passive: false});
 
 </script>
 
