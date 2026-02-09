@@ -11,8 +11,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js (Updated to 0.160.0 to support CapsuleGeometry) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -67,6 +67,15 @@
             line-height: 1.8;
             font-size: 1.125rem;
         }
+        .error-message {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #f87171;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +83,43 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef, useMemo } = React;
+
+        // --- Error Boundary Component ---
+        class ErrorBoundary extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+
+            componentDidCatch(error, errorInfo) {
+                console.error("React Error:", error, errorInfo);
+            }
+
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="p-8 text-center">
+                            <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
+                            <p className="mb-4">The application encountered an error.</p>
+                            <pre className="error-message text-left overflow-auto">
+                                {this.state.error && this.state.error.toString()}
+                            </pre>
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+                            >
+                                Reload Page
+                            </button>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
 
         // --- 3D Helper Components ---
 
@@ -86,6 +132,12 @@
 
             useEffect(() => {
                 if (!containerRef.current) return;
+
+                // Simple check to ensure THREE is loaded
+                if (typeof THREE === 'undefined') {
+                    console.error("Three.js not loaded");
+                    return;
+                }
 
                 const width = containerRef.current.clientWidth;
                 const height = containerRef.current.clientHeight;
@@ -106,14 +158,23 @@
                 scene.add(pointLight);
 
                 // User Init
-                const userObjects = initScene(scene, camera, renderer);
+                let userObjects = {};
+                try {
+                    userObjects = initScene(scene, camera, renderer);
+                } catch (err) {
+                    console.error("Error initializing scene:", err);
+                }
                 sceneInfoRef.current = { scene, camera, renderer, userObjects };
 
                 // Animation Loop
                 const animate = (time) => {
                     requestRef.current = requestAnimationFrame(animate);
                     if (animateScene && sceneInfoRef.current) {
-                        animateScene(sceneInfoRef.current, time);
+                        try {
+                            animateScene(sceneInfoRef.current, time);
+                        } catch (err) {
+                            // Suppress animation errors to prevent log spam, but log once ideally
+                        }
                     }
                     renderer.render(scene, camera);
                 };
@@ -281,7 +342,7 @@
                 rotorGroup.add(axle);
 
                 // Subunits
-                const petalGeo = new THREE.CapsuleGeometry(0.4, 1, 4, 8);
+                const petalGeo = new THREE.CapsuleGeometry(0.4, 1, 4, 8); // Requires newer Three.js
                 const colors = [0xfca5a5, 0xfcd34d, 0x86efac];
                 for(let i=0; i<3; i++) {
                     const petalMat = new THREE.MeshStandardMaterial({ color: colors[i] });
@@ -317,6 +378,8 @@
 
             const animate = (info, time) => {
                 const { rotorGroup, particles } = info.userObjects;
+                if (!rotorGroup) return; 
+
                 // Rotate turbine
                 rotorGroup.rotation.y -= 0.05 * speed;
 
@@ -615,6 +678,7 @@
                         </p>
                     </header>
 
+                    <ErrorBoundary>
                     <main className="prose-custom text-gray-800">
                         <p>
                             AI exists in layers. It has snapshots and a functional understanding but no temporal relationship with the world. Human consciousness has a <em>specious present</em>; we experience a flow of time—one dimension of our world and our reality—which we lack the language to define and understand in scientific terms, very plainly.
@@ -723,6 +787,7 @@
                             <DNASpiral />
                         </div>
                     </main>
+                    </ErrorBoundary>
 
                     <footer className="mt-20 pt-8 border-t border-gray-200 text-center text-gray-500 text-sm">
                         <p>Essay & Design generated via Gemini. Powered by React & Three.js.</p>
