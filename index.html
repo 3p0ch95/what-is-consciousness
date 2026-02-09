@@ -1,3 +1,10 @@
+Here is the updated HTML file.
+
+I have:
+
+Removed the ATP Turbine section completely.
+Removed all borders and container boxes from the interactive modules. The 3D brain and the Scale simulation now float seamlessly within the page layout (using the same background color), making them feel like living illustrations rather than separate "widgets."
+Refined the UI controls to be more minimal to match the seamless aesthetic.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,11 +16,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f9f9f9;
+            --bg-color: #fcfcfc;
             --text-color: #222;
             --accent-color: #666;
             --font-serif: 'Merriweather', serif;
             --font-sans: 'Inter', sans-serif;
+            
+            /* Brain Colors */
             --frontal-color: #e74c3c;
             --parietal-color: #3498db;
             --temporal-color: #2ecc71;
@@ -25,7 +34,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-serif);
-            line-height: 1.8;
+            line-height: 1.9;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
@@ -43,13 +52,16 @@
         
         p {
             margin-bottom: 1.5em;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             color: #333;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Layout */
         header {
-            padding: 4rem 1rem;
+            padding: 6rem 1rem 4rem 1rem;
             text-align: center;
             max-width: 800px;
             margin: 0 auto;
@@ -64,64 +76,59 @@
         }
 
         article {
-            max-width: 700px;
+            max-width: 900px; /* Wider to accommodate visuals, text restricted in p tags */
             margin: 0 auto;
-            padding: 0 1rem 4rem 1rem;
+            padding: 0 1rem 6rem 1rem;
         }
 
-        /* Interactive Containers */
+        /* Seamless Interactive Containers */
         .interactive-module {
-            margin: 3rem 0;
+            margin: 5rem 0;
             padding: 0;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: all 0.5s ease;
+            background: transparent;
+            border: none; /* Removed Border */
+            box-shadow: none; /* Removed Shadow */
             position: relative;
-            overflow: hidden;
             font-family: var(--font-sans);
-        }
-
-        .interactive-module:hover {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-color: #bbb;
+            text-align: center;
         }
 
         .module-label {
-            position: absolute;
-            top: 15px;
-            left: 15px;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #999;
-            pointer-events: none;
-            z-index: 10;
+            color: #aaa;
+            margin-bottom: 1rem;
+            display: block;
         }
 
         .info-panel {
-            padding: 1.5rem;
-            font-size: 0.9rem;
+            padding: 1rem;
+            font-size: 0.95rem;
             color: #555;
-            text-align: center;
-            background: #fff;
-            border-top: 1px solid #eee;
-            min-height: 80px;
+            background: transparent;
+            border-top: 1px solid rgba(0,0,0,0.05); /* Very subtle separator */
+            min-height: 60px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* 1. SCALE SIMULATION CSS */
         #scale-visual {
-            height: 300px;
+            height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
             filter: grayscale(100%);
             transition: filter 0.5s ease;
             position: relative;
+            /* No background color for seamless integration */
         }
         
         .interactive-module:hover #scale-visual {
@@ -136,50 +143,21 @@
         
         .slider-container {
             padding: 0 2rem 1rem 2rem;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         input[type=range] {
             width: 100%;
             accent-color: #333;
-        }
-
-        /* 2. ATP TURBINE CSS */
-        #atp-visual {
-            height: 350px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        #atp-svg {
-            width: 220px;
-            height: auto;
-            fill: #444;
-            transition: fill 0.5s ease;
-            cursor: pointer;
-        }
-
-        .interactive-module:hover #atp-svg {
-            fill: #555; /* Base color change on hover */
-        }
-        
-        .atp-part {
-            transition: fill 0.3s, transform 0.3s;
-            transform-box: fill-box;
-            transform-origin: center;
-        }
-        
-        .atp-part:hover {
-            fill: #2ecc71 !important;
-            filter: drop-shadow(0 0 5px rgba(46, 204, 113, 0.5));
+            background: transparent;
         }
 
         /* 3. 3D BRAIN CSS */
         #brain-container {
-            height: 450px;
+            height: 500px;
             width: 100%;
-            background: #f0f0f0;
+            background: transparent; /* Seamless */
             cursor: move; 
             position: relative;
         }
@@ -194,44 +172,41 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-top: 1px solid #eee;
+            gap: 15px;
+            padding: 20px 0;
         }
 
         .brain-btn {
-            background: #fff;
-            border: 1px solid #ccc;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #ddd;
             padding: 5px 10px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 4px;
+            color: #888;
             transition: all 0.2s;
             font-family: var(--font-sans);
+            font-weight: 500;
         }
 
         .brain-btn:hover {
-            background: #eee;
+            color: #333;
+            border-color: #bbb;
         }
 
-        .brain-btn.active {
-            color: white;
-            border-color: transparent;
-        }
-
-        /* Specific colors for active buttons */
-        .btn-frontal.active { background: var(--frontal-color); }
-        .btn-parietal.active { background: var(--parietal-color); }
-        .btn-temporal.active { background: var(--temporal-color); }
-        .btn-occipital.active { background: var(--occipital-color); }
-        .btn-cerebellum.active { background: var(--cerebellum-color); }
+        /* Active states show color but keep minimal style */
+        .btn-frontal.active { color: var(--frontal-color); border-color: var(--frontal-color); }
+        .btn-parietal.active { color: var(--parietal-color); border-color: var(--parietal-color); }
+        .btn-temporal.active { color: var(--temporal-color); border-color: var(--temporal-color); }
+        .btn-occipital.active { color: var(--occipital-color); border-color: var(--occipital-color); }
+        .btn-cerebellum.active { color: var(--cerebellum-color); border-color: var(--cerebellum-color); }
 
         .sub-detail {
             font-weight: 600;
             display: block;
             margin-bottom: 5px;
             color: #000;
+            font-size: 1rem;
         }
 
     </style>
@@ -254,7 +229,7 @@
 
     <!-- INTERACTIVE MODULE 1: SCALE OF REALITY -->
     <div class="interactive-module" id="scale-module">
-        <div class="module-label">Interactive Figure 1: The Bifurcation of Concept</div>
+        <span class="module-label">Figure 1: The Bifurcation of Concept</span>
         <div id="scale-visual">
             <div id="scale-object" class="orb"></div>
         </div>
@@ -276,7 +251,7 @@
 
     <!-- INTERACTIVE MODULE 3: 3D BRAIN EXPLORER -->
     <div class="interactive-module">
-        <div class="module-label">Interactive Figure 2: The Neural Architecture</div>
+        <span class="module-label">Figure 2: The Neural Architecture</span>
         <div id="brain-container">
             <canvas id="brain-canvas"></canvas>
         </div>
@@ -298,36 +273,7 @@
 
     <p>What makes us different from an ant, if so much of us are all the same? We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness. Likely the ant has no concept of the broader good it will do while it marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
 
-    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce? Will the hydrogen ion force the ATP synthase turbine to turn, will the oxygen accept the hydrogen?</p>
-
-    <!-- INTERACTIVE MODULE 2: ATP TURBINE -->
-    <div class="interactive-module">
-        <div class="module-label">Interactive Figure 3: The Engine of Life</div>
-        <div id="atp-visual">
-            <svg id="atp-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <!-- Stator (Outer) -->
-                <path class="atp-part stator" d="M30,150 L30,50 C30,20 60,0 100,0 C140,0 170,20 170,50 L170,150" 
-                      fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"
-                      onclick="updateAtpInfo('Stator', 'The static component holding the structure. It allows protons to flow, creating the gradient needed for motion.')"/>
-                
-                <!-- Rotor (Inner) -->
-                <g id="turbine-blades" class="atp-part rotor" onclick="updateAtpInfo('Rotor/Shaft', 'Gamma subunit. Spins at up to 6000 RPM, converting proton gradient energy into mechanical force.')">
-                    <circle cx="100" cy="120" r="15" />
-                    <rect x="95" y="40" width="10" height="80" rx="5" />
-                    <path d="M100,120 L60,160 L70,170 L100,130 Z" />
-                    <path d="M100,120 L140,160 L130,170 L100,130 Z" />
-                </g>
-
-                <!-- Base (F1 unit) -->
-                <ellipse class="atp-part base" cx="100" cy="170" rx="60" ry="20" fill="currentColor" opacity="0.8"
-                         onclick="updateAtpInfo('F1 Unit', 'The catalytic knob. Mechanical energy forces ADP + Pi together to form ATP.')"/>
-            </svg>
-        </div>
-        <div class="info-panel" id="atp-info">
-            <span class="sub-detail">ATP Synthase Turbine</span>
-            Click components to analyze function. Click the center shaft to generate energy.
-        </div>
-    </div>
+    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce?</p>
     
     <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers?</p>
 
@@ -394,42 +340,7 @@
         }
     });
 
-    // --- Interaction 2: The ATP Turbine ---
-    const atpSvg = document.getElementById('atp-svg');
-    const blades = document.getElementById('turbine-blades');
-    const atpInfo = document.getElementById('atp-info');
-    let atpRotation = 0;
-    let atpSpinning = false;
-    let atpInterval;
-
-    function updateAtpInfo(title, desc) {
-        atpInfo.innerHTML = `<span class="sub-detail">${title}</span>${desc}`;
-    }
-
-    blades.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if(!atpSpinning) {
-            atpSpinning = true;
-            updateAtpInfo('Generating ATP', 'Hydrogen ions flow through the gradient. Mechanical energy is converted to chemical energy.');
-            atpInterval = setInterval(() => {
-                atpRotation += 15;
-                blades.setAttribute('transform', `rotate(${atpRotation} 100 120)`);
-            }, 16);
-            
-            // Turn green on spin
-            atpSvg.style.fill = "#2ecc71";
-            
-            setTimeout(() => {
-                clearInterval(atpInterval);
-                atpSpinning = false;
-                atpSvg.style.fill = "#444";
-                updateAtpInfo('ATP Synthase', 'Cycle complete. Awaiting proton gradient.');
-            }, 3000);
-        }
-    });
-
-
-    // --- Interaction 3: The 3D Particle Brain ---
+    // --- Interaction 2: The 3D Particle Brain ---
     const canvas = document.getElementById('brain-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
@@ -544,7 +455,6 @@
             targetAngleX = 0;
         } else {
             targetZoom = 1.8; // Zoom in
-            // Ideally rotate to face the lobe, but for now we keep user rotation or static
         }
     }
 
@@ -583,7 +493,7 @@
 
         const projectedPoints = particles.map(p => project(p, angleX, angleY));
         
-        // Sorting for depth (simple painter's algorithm)
+        // Sorting for depth
         projectedPoints.sort((a, b) => b.z - a.z);
 
         // Draw Particles
@@ -615,7 +525,6 @@
             ctx.strokeStyle = `rgba(${lobeData[currentLobe].color}, 0.2)`;
             ctx.lineWidth = 1;
             
-            // Just draw some random connections between active particles to simulate neural activity
             for(let i=0; i<projectedPoints.length; i+=5) {
                 let p1 = projectedPoints[i];
                 if(p1.lobe === currentLobe) {
