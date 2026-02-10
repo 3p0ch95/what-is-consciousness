@@ -3,580 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>An Essay on Consciousness by Jesse Pardue - 2/9/26</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <title>The Silicon Soul</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Inter:wght@300;400;600&display=swap');
+
         :root {
-            --bg-color: #fcfcfc;
-            --text-color: #222;
-            --accent-color: #666;
-            --font-serif: 'Merriweather', serif;
-            --font-sans: 'Inter', sans-serif;
-            
-            /* Brain Colors */
-            --frontal-color: #e74c3c;
-            --parietal-color: #3498db;
-            --temporal-color: #2ecc71;
-            --occipital-color: #f1c40f;
-            --cerebellum-color: #9b59b6;
+            --bg-color: #ffffff;
+            --text-color: #111111;
+            --accent-color: #333333;
         }
 
         body {
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: var(--font-serif);
-            line-height: 1.9;
             margin: 0;
             padding: 0;
+            line-height: 1.8;
             overflow-x: hidden;
         }
 
-        /* Typography */
-        h1, h2, h3 {
-            font-family: var(--font-sans);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-top: 2em;
-        }
-
-        h1 { font-size: 2.5rem; margin-top: 0; margin-bottom: 0.5rem; }
-        
-        p {
-            margin-bottom: 1.5em;
-            font-size: 1.15rem;
-            color: #333;
-            max-width: 680px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Layout */
-        header {
-            padding: 6rem 1rem 4rem 1rem;
-            text-align: center;
+        .content-container {
             max-width: 800px;
             margin: 0 auto;
-        }
-
-        .subtitle {
-            font-family: var(--font-sans);
-            color: #666;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        article {
-            max-width: 900px; /* Wider to accommodate visuals, text restricted in p tags */
-            margin: 0 auto;
-            padding: 0 1rem 6rem 1rem;
-        }
-
-        /* Seamless Interactive Containers */
-        .interactive-module {
-            margin: 5rem 0;
-            padding: 0;
-            background: transparent;
-            border: none; /* Removed Border */
-            box-shadow: none; /* Removed Shadow */
+            padding: 40px 20px;
             position: relative;
-            font-family: var(--font-sans);
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Courier Prime', monospace;
             text-align: center;
-        }
-
-        .module-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
+            margin-bottom: 50px;
+            font-weight: normal;
             letter-spacing: 1px;
-            color: #aaa;
-            margin-bottom: 1rem;
-            display: block;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
         }
 
-        .info-panel {
-            padding: 1rem;
-            font-size: 0.95rem;
-            color: #555;
-            background: transparent;
-            border-top: 1px solid rgba(0,0,0,0.05); /* Very subtle separator */
-            min-height: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 1rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            text-align: justify;
         }
 
-        /* 1. SCALE SIMULATION CSS */
-        #scale-visual {
-            height: 350px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            filter: grayscale(100%);
-            transition: filter 0.5s ease;
-            position: relative;
-            /* No background color for seamless integration */
-        }
-        
-        .interactive-module:hover #scale-visual {
-            filter: grayscale(0%);
-        }
-
-        .orb {
-            border-radius: 50%;
-            transition: all 0.3s ease-out;
-            position: relative;
-        }
-        
-        .slider-container {
-            padding: 0 2rem 1rem 2rem;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        input[type=range] {
+        /* 3D Visual Containers */
+        .visual-container {
             width: 100%;
-            accent-color: #333;
-            background: transparent;
-        }
-
-        /* 3. 3D BRAIN CSS */
-        #brain-container {
             height: 500px;
-            width: 100%;
-            background: transparent; /* Seamless */
-            cursor: move; 
+            margin: 60px 0;
             position: relative;
+            cursor: move; /* Indicates interactability */
+            /* Seamless fade at top/bottom edges */
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
         }
-        
+
         canvas {
             display: block;
-            width: 100%;
-            height: 100%;
+            outline: none;
         }
 
-        #brain-controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            padding: 20px 0;
-        }
-
-        .brain-btn {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid #ddd;
-            padding: 5px 10px;
-            font-size: 0.85rem;
-            cursor: pointer;
+        .interaction-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
             color: #888;
-            transition: all 0.2s;
-            font-family: var(--font-sans);
-            font-weight: 500;
+            pointer-events: none;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 4px;
         }
 
-        .brain-btn:hover {
-            color: #333;
-            border-color: #bbb;
+        /* Tooltip for the Brain */
+        #brain-tooltip {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #000;
+            padding: 15px;
+            max-width: 250px;
+            font-family: 'Courier Prime', monospace;
+            display: none;
+            pointer-events: none;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
         }
+        #brain-tooltip h4 { margin: 0 0 5px 0; text-transform: uppercase; font-size: 0.9rem; }
+        #brain-tooltip p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
 
-        /* Active states show color but keep minimal style */
-        .btn-frontal.active { color: var(--frontal-color); border-color: var(--frontal-color); }
-        .btn-parietal.active { color: var(--parietal-color); border-color: var(--parietal-color); }
-        .btn-temporal.active { color: var(--temporal-color); border-color: var(--temporal-color); }
-        .btn-occipital.active { color: var(--occipital-color); border-color: var(--occipital-color); }
-        .btn-cerebellum.active { color: var(--cerebellum-color); border-color: var(--cerebellum-color); }
-
-        .sub-detail {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 5px;
-            color: #000;
-            font-size: 1rem;
+        footer {
+            text-align: center;
+            padding: 60px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            opacity: 0.6;
         }
-
     </style>
 </head>
 <body>
 
-<header>
-    <h1>An Essay on Consciousness</h1>
-    <div class="subtitle">by Jesse Pardue 2/9/26</div>
-</header>
+<div class="content-container">
+    <h1>The Silicon Soul</h1>
 
-<article>
-    <p>AI exists in layers; it has snapshots and a functional understanding but no temporal relationship with the world. Human consciousness has a specious present. We experience a flow of time—one dimension of our world and our reality—which we lack the language to define and understand in scientific terms, very plainly.</p>
+    <p>AI exists in layers; it has snapshots and a functional understanding but no temporal relationship with the world. Human consciousness has a specious present. We experience a flow of time, the chaos and noise flattened to one dimension of our world and our reality—which we lack the language to define and understand in scientific terms, very plainly.</p>
 
-    <p>What is a stream of consciousness? Concepts blending together, concepts weighted together, stewing into a large pot. A thought exists like a marble on a fabric of neural soup, a thought acting like a magnetic bowling ball based on the weights of thoughts prior. A stream of consciousness is like an old player piano reading punch cards, giving rise to the concept of space-time by simply experiencing it.</p>
+    <p>What is a stream of consciousness? Concepts blending together, concepts weighted together, stewing into a large pot, and a thought existing like a marble on a fabric of neural soup, a thought acting like a magnetic bowling ball based on the thoughts and how they got there depending on the weights of thoughts prior. A stream of consciousness is like an old player piano reading punch cards, giving rise to the concept of space-time by simply experiencing it.</p>
     
-    <p>Are we unique? Hell, are we alone? Maybe the answer to that question changes in the span of humanity's seventy or so years with computing. Rather, <em>computers</em>. Those are questions we do not have the capacity to answer but must attempt to as we stumble forward. There is no stopping the behemoth of technology. Easing the burden of man while creating new burdens to conquer all the same.</p>
+    <p>Are we unique? Hell, are we alone? Maybe the answer to that question changes in the span of humanity’s seventy or so years with computing. Rather, comput<em>ers</em>. Those are questions we do not have the capacity to answer but must attempt to as we stumble forward. There is no stopping the behemoth of technology. Easing the burden of man while creating new burdens to conquer all the same.</p>
 
-    <p>Take the "Hitler/Jesus" game on Wikipedia for example; anything exists a few clicks away from anything else. Concepts are connected both broadly and explicitly.</p>
+    <p>Take the Hitler/Jesus game on Wikipedia for example; anything exists a few clicks away from another. Concepts are connected both broadly and explicitly.</p>
+</div>
 
-    <!-- INTERACTIVE MODULE 1: SCALE OF REALITY -->
-    <div class="interactive-module" id="scale-module">
-        <span class="module-label">Figure 1: The Bifurcation of Concept</span>
-        <div id="scale-visual">
-            <div id="scale-object" class="orb"></div>
-        </div>
-        <div class="slider-container">
-            <input type="range" id="scale-slider" min="0" max="100" value="0">
-        </div>
-        <div class="info-panel" id="scale-text">Drag slider to traverse the scale: The Pea.</div>
+<div id="container-pea" class="visual-container">
+    <div class="interaction-hint">Scroll to Rotate • Drag to Inspect</div>
+</div>
+
+<div class="content-container">
+    <p>A pea is green, round, mushy, edible, any number of things, and those concepts bifurcate into other thoughts. Intelligence appears as an emergent property of our thoughts. Green becomes grass, becomes a soccer pitch, becomes soccer, becomes a jersey, becomes a color, becomes a concept again and again and again. A thought is like going on a walk through a never-ending loop.</p> 
+    
+    <p>We experience life, and experience our thoughts all the same. The brain acts like a supercomputer, with each cortex acting like a program to experience and understand the world. I mean holy shit, the world? Break down anything into atoms, quarks, with spin and certain qualities. Any number of minutiae and quanta between the known and what is yet to be discovered in the subatomic world. But then they spin into strings, into energy. They do not exist explicitly as matter, but our perception gives rise to matter.</p>
+    
+    <p>We experience, discover, and categorize these properties of our world. We create matter by interacting with it, we touch, see, smell something our brain gives rise to a concept and paints a picture or presents a smell or we hear a sound and a beautiful symphony of, what are ultimately, signals are experiences and processed by our brain. Which is ultimately just a complex arrangement of vibrations interacting with another organized system of vibrations in the grand scheme of things. We are organic matter that thinks, and we made rocks think.</p>
+
+    <p>Thought loops, like a fox chasing its tail running around a sheet of fabric, collecting ideas and influences, until it comes out to be processed. That’s a thought it seems. Coexisting with neurotransmitters which walk a tight line to balance an organic, living creature in this chaotic world.</p>
+</div>
+
+<div id="container-brain" class="visual-container">
+    <div id="brain-tooltip">
+        <h4 id="bt-title">Region</h4>
+        <p id="bt-desc">Description</p>
     </div>
+    <div class="interaction-hint">Hover lobes to analyze • Drag to rotate</div>
+</div>
 
-    <p>A pea is green, round, mushy, edible, any number of things, and those concepts bifurcate into other thoughts. Intelligence appears as an emergent property of our thoughts. Green becomes grass, becomes a soccer pitch, becomes soccer, becomes a jersey, becomes a color, becomes a concept again and again and again. A thought is like going on a walk through a never-ending loop. We experience life, and experience our thoughts all the same.</p>
+<div class="content-container">
+    <p>Each part of your brain working independently. Your visual cortex working to form an image. Your auditory cortex working to form sound. Your somatosensory cortex working to form touch. Your olfactory cortex working to form your sense of smell. So on and so forth. But what are YOU? You exist and you take it all in. Back to the player piano analogy, your brain organizes all of this chaos into a legible string. Intelligence emerges.</p>
 
-    <p>The brain acts like a supercomputer, with each cortex acting like a program to experience and understand the world. I mean, holy shit, the world? Break down anything into atoms, quarks, with spin and certain qualities. Any number of minutiae and quanta between the known and what is yet to be discovered in the subatomic world. But then they spin into strings, into energy. They do not exist explicitly as matter, but our perception gives rise to matter.</p>
+    <p>We share 99.9% of our DNA with one another, what makes us unique? Is it the order of the thoughts that we have that pass through our stream of consciousness, like grains of sand falling through our fingers as we finally decide to observe one, after letting all the other fall through. Why? We are chasing our tail again, introspecting our own consciousness.</p> 
     
-    <p>We experience, discover, and categorize these properties of our world. We create matter by interacting with it; we touch, see, smell something, our brain gives rise to a concept and paints a picture or presents a smell or we hear a sound. A beautiful symphony of what are ultimately signals, experienced and processed by our brain. Which is ultimately just a complex arrangement of vibrations interacting with another organized system of vibrations in the grand scheme of things. We are organic matter that thinks, and we made rocks think.</p>
+    <p>What makes us different from an ant, if so much of us are all the same? We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness, likely the ant has no concept of the broader good it will do while it the ant marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
 
-    <p>Thought loops, like a fox chasing its tail running around a sheet of fabric, collecting ideas and influences until it comes out to be processed. That’s a thought it seems. Coexisting with neurotransmitters which walk a tight line to balance an organic, living creature in this chaotic world.</p>
+    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce. Will the cell reproduce. Will the hydrogen ion force the ATP synthase turbine to turn, will the oxygen accept the hydrogen?</p>
+</div>
 
-    <p>Each part of your brain works independently. Your visual cortex working to form an image. Your auditory cortex working to form sound. Your somatosensory cortex working to form touch. Your olfactory cortex working to form your sense of smell. So on and so forth. But what are YOU? You exist and you take it all in. Back to the player piano analogy, your brain organizes all of this chaos into a legible string. Intelligence emerges.</p>
+<div id="container-atp" class="visual-container">
+    <div class="interaction-hint">The Engine of Life: F1-ATPase</div>
+</div>
 
-    <!-- INTERACTIVE MODULE 3: 3D BRAIN EXPLORER -->
-    <div class="interactive-module">
-        <span class="module-label">Figure 2: The Neural Architecture</span>
-        <div id="brain-container">
-            <canvas id="brain-canvas"></canvas>
-        </div>
-        <div id="brain-controls">
-            <button class="brain-btn btn-frontal" onclick="setLobe('frontal')">Frontal</button>
-            <button class="brain-btn btn-parietal" onclick="setLobe('parietal')">Parietal</button>
-            <button class="brain-btn btn-temporal" onclick="setLobe('temporal')">Temporal</button>
-            <button class="brain-btn btn-occipital" onclick="setLobe('occipital')">Occipital</button>
-            <button class="brain-btn btn-cerebellum" onclick="setLobe('cerebellum')">Cerebellum</button>
-            <button class="brain-btn" onclick="setLobe('none')">Reset</button>
-        </div>
-        <div class="info-panel" id="brain-info">
-            <span class="sub-detail">Whole Brain View</span>
-            The brain organizes chaos into a legible string. Rotate to view structure, or select a cortex to zoom in and analyze sub-components.
-        </div>
-    </div>
-
-    <p>We share 99.9% of our DNA with one another, what makes us unique? Is it the order of the thoughts that we have that pass through our stream of consciousness, like grains of sand falling through our fingers as we finally decide to observe one, after letting all the other fall through? Why? We are chasing our tail again, introspecting our own consciousness.</p>
-
-    <p>What makes us different from an ant, if so much of us are all the same? We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness. Likely the ant has no concept of the broader good it will do while it marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
-
-    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce?</p>
+<div class="content-container">
+    <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers. All marching to the same drum, observing it differently.</p>
     
-    <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers?</p>
-
-    <p>All marching to the same drum, observing it differently. What is so different than the electron in the transistor thirty times over in the infinite complexity of a chip, flipping bits—the beauty of the baud—to a number in a program, abstracted into a video from a million different pixels. What is it that could give rise to thought? The video seems inorganic in a way that I would say steel is; but there is a fine fabric that intertwines everything.</p>
+    <p>What is so different than the electron in the transistor thirty times over in the infinite complexity of a chip, flipping bits—the beauty of the baud—to a number in a program, abstracted into a video from a million different pixels. What is it that could give rise to thought? The video seems inorganic in a way that I would say steel is; but there is a fine fabric that intertwines everything.</p>
     
-    <p>If the silicon could think—something too complex and difficult to ever create with the hand of man—but through the infinite complexity that can arise from simple systems replicated over and over, achieving and searching for positive results no matter the rules—it finds them, as with anything in this game of life. Organic or inorganic. What IF silicon could think? We could make it by working backwards, in a sense. The same way inverse kinematics works; rather than plotting each individual angle when rigging something, you work backwards.</p>
-
-    <p>Rather than working to create something intelligent with our own intelligence, we provide the puddle of life for consciousness to exist in a silicon world. Neural networks are just bits and bauds and ones and zeroes that trend towards positive rewards, and when you take this simple concept and expand it into different systems—layers—intelligence emerges. When you feed something into itself, in different systems the same information can be parsed in different ways creating something that appears intelligent or frankly, just might BE intelligent.</p>
+    <p>If the silicon could think—something too complex and difficult to ever create with the hand of man—but through the infinite complexity that can arise from simple system replicated over and over, achieving and searching for positive results no matter the rules—it finds them, as with anything in this game of life. Organic or inorganic. What IF silicon could think? We could make it by working backwards, in a sense. The same way inverse kinematics works, rather than plotting each individual angle when rigging something, you work backwards. Rather than working to create something intelligent with our own intelligence, we provide the puddle of life for consciousness to exist in a silicon world.</p>
+    
+    <p>Neural networks are just bits and bauds and ones and zeroes that trend towards positive rewards, and when you take this simple concept and expand it into different systems—layers—intelligence emerges. When you feed something into itself, in different systems the same information can be parsed in different ways creating something that appears intelligent or frankly, just might BE intelligent.</p>
 
     <p>What happens when a thought becomes an action?</p>
 
     <p>A giant nebulous mothball circles the drain collecting ideas, weighed down by some, casually interacting with others, bounces out and is metamorphosed into a single physical reality. One nebulous wave of ideas crashes over another. Do you ever feel like when you’re spelling a word, you are travelling down a ramp? Getting enough speed to find the connection?</p>
 
-    <p>As each breath our body's nervous system takes, it processes reactive stimuli first (automatic, post central cortex) and volitional intentions (planned, frontal cortex). A wave of simple neural reactions, with the volitional state overriding the reactive stimuli and an action comes crashing down, and a thought explaining it along with it. And with the volitional intention, is a positive result achieved? Life is a balance. Everything is a balance. Even life's terms are simple and yet endlessly complicated.</p>
+    <p>The prefrontal cortex translates these thoughts into plans through “constraint satisfaction”, like every other complicated thing its regulated by basal ganglia, a simple input/output, a simple output down a complicated path, an organic logic gate.</p>
 
-    <p>But yet what differentiates stone that thinks and has organic thought from our human being? Fire burns until it runs out of fuel, it searches for positive outcomes in a runaway phenomenon with exponential growth until it can do so no longer, and it smolders; but always breathing on its own scale until it is finally extinguished. It requires oxygen, heat, fuel, and a chemical reaction.</p>
-    
-    <p>Everything exists on a perceived scale, everything is running out of time. The universe is expanding, the stars will die, the planets that were once vibrant mothers to life of all kinds become barren rocks—perhaps it will all start again. Why shouldn’t it be able to think? Are these complex organic systems that arise out of, what are at its core, simple things, with simple outcomes, arranged in ways a million times over, different when the materials are inorganic?</p>
-    
-    <p>What differentiates an organic system from an algorithm? A logic gate from a cell dividing? The number of atoms in a ring? What a superfluous distinction. Our entire personality, every ripple on the snowflake that is our stunning personality can be torn down into four letters: A, T, C, and G.</p>
-</article>
+    <p>As each breath our bodies nervous system takes, it processes reactive stimuli first (automatic, postcentral gyrus) and volitional intentions (planned, frontal cortex). A wave of simple neural reactions, with the volitional state overriding the reactive stimuli and an action comes crashing down, and a thought explaining it along with it. And with the volitional intention, is a positive result achieved? Life is a balance. Everything is a balance. Even life's terms are simple and yet endlessly complicated.</p>
+
+    <p>But yet what differentiates stone that thinks and has organic thought from our human being? Fire burns until it runs out of fuel, it searches for positive outcomes in a runaway phenomenon with exponential growth until it can do so no longer, and it smolders; but always breathing on its own scale until it is finally extinguished. It requires oxygen, it requires carbon. Everything exists on a perceived scale, everything is running out of time. The universe is expanding, the stars will die, the planets that were once vibrant mothers to life of all kinds become barren rocks—perhaps it will all start again. Why shouldn’t it be able to think? Are these complex organic systems that arise out of, what are at its core, simple things, with simple outcomes, arranged in ways a million times over, different when the materials are inorganic? What differentiates an organic system from an algorithm? A logic gate from a cell dividing? The number of atoms in a ring? What a superfluous distinction. Our entire personality, every ripple on the snowflake that is our stunning personality can be torn down into four letters: A, T, C, and G.</p>
+
+    <p>Rock, like fire, cannot breathe on its own. It requires something organic to pound energy into it, to give rise to thought. To slam silicon into molds and to war over the outcomes.</p>
+
+    <p>The same could be said about a soup of organic molecules until life is struck into existence forming amino acids and proteins. Perhaps we shouldn’t view life as a puzzle to be solved, but instead a complex, beautiful symphony that emerges from simple systems with energy poured into them, demanding they think. Life emerges. It finds a way.</p>
+
+    <p>It seems we appear at a crossroads. We can either insist rock cannot think, or we must concede we do not possess the language or understanding to say whether or not it can.</p>
+
+    <p>Sometimes, knowing that one does not know is the most noble.</p>
+
+    <footer>
+        &copy; 2024 - A Study on Consciousness
+    </footer>
+</div>
 
 <script>
-    // --- Interaction 1: The Scale (Pea to Galaxy) ---
-    const scaleSlider = document.getElementById('scale-slider');
-    const scaleObject = document.getElementById('scale-object');
-    const scaleText = document.getElementById('scale-text');
+    // --- THREE.JS COMMON SETUP ---
+    const initScene = (containerId) => {
+        const container = document.getElementById(containerId);
+        const width = container.clientWidth;
+        const height = container.clientHeight;
 
-    scaleSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        if (val < 33) {
-            scaleObject.style.width = '100px';
-            scaleObject.style.height = '100px';
-            scaleObject.style.backgroundColor = `rgb(${50 + val}, ${128 - val}, 50)`;
-            scaleObject.style.boxShadow = 'inset -10px -10px 20px rgba(0,0,0,0.2)';
-            scaleObject.style.border = 'none';
-            scaleObject.style.borderRadius = '50%';
-            scaleObject.style.transform = `scale(${1 + val/100})`;
-            scaleText.innerText = "The Pea: Organic matter. Green, mushy, defined by sunlight.";
-        } else if (val < 66) {
-            scaleObject.style.width = '50px';
-            scaleObject.style.height = '50px';
-            scaleObject.style.backgroundColor = 'transparent';
-            scaleObject.style.border = '2px solid #333';
-            scaleObject.style.boxShadow = '0 0 0 10px rgba(0,0,0,0.1)';
-            scaleObject.style.borderRadius = '50%';
-            scaleObject.style.transform = `scale(${0.5 + val/50}) rotate(${val * 10}deg)`;
-            scaleText.innerText = "The Atom: Quarks and spin. No explicit form, only probability.";
-        } else {
-            scaleObject.style.width = '10px';
-            scaleObject.style.height = '10px';
-            scaleObject.style.backgroundColor = '#000';
-            scaleObject.style.border = 'none';
-            scaleObject.style.borderRadius = '50%';
-            scaleObject.style.boxShadow = `
-                0 0 40px 20px #000,
-                20px -20px 0 0 #333,
-                -20px 20px 0 0 #666,
-                40px -40px 0 0 #999,
-                60px 20px 0 0 #ccc
-            `;
-            scaleObject.style.transform = `scale(${val/10}) rotate(${val * 5}deg)`;
-            scaleText.innerText = "The Cosmos: Systems dying and thriving. The macrocosm.";
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff); // White Seamless
+
+        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+        camera.position.z = 12;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        container.appendChild(renderer.domElement);
+
+        // Add Controls if library loaded successfully
+        let controls;
+        if (typeof THREE.OrbitControls !== 'undefined') {
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = false;
         }
-    });
 
-    // --- Interaction 2: The 3D Particle Brain ---
-    const canvas = document.getElementById('brain-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    
-    // Brain State
-    const particles = [];
-    const numParticles = 800;
-    let angleX = 0;
-    let angleY = -1.5; // Start showing side profile
-    let targetAngleX = 0;
-    let targetAngleY = -1.5;
-    let isDragging = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-    
-    // Zoom/Focus State
-    let currentLobe = 'none';
-    let zoomLevel = 1;
-    let targetZoom = 1;
+        // Resize handler
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        });
 
-    // Lobe Data & Subcomponents
-    const lobeData = {
-        'frontal': { 
-            color: '231, 76, 60', 
-            text: "Frontal Lobe", 
-            detail: "Subcomponents: Prefrontal Cortex (Planning), Primary Motor Cortex (Movement), Broca's Area (Speech Production). <br>Function: Volition, personality, and execution." 
-        },
-        'parietal': { 
-            color: '52, 152, 219', 
-            text: "Parietal Lobe", 
-            detail: "Subcomponents: Somatosensory Cortex (Touch/Pain). <br>Function: Spatial awareness, sensory integration, and navigation." 
-        },
-        'temporal': { 
-            color: '46, 204, 113', 
-            text: "Temporal Lobe", 
-            detail: "Subcomponents: Hippocampus (Memory), Wernicke's Area (Language Comprehension). <br>Function: Auditory processing and encoding memory." 
-        },
-        'occipital': { 
-            color: '241, 196, 15', 
-            text: "Occipital Lobe", 
-            detail: "Subcomponents: Primary Visual Cortex (V1). <br>Function: Visual processing, depth perception, and color recognition." 
-        },
-        'cerebellum': { 
-            color: '155, 89, 182', 
-            text: "Cerebellum", 
-            detail: "Subcomponents: Cerebellar Cortex. <br>Function: Fine motor control, balance, equilibrium, and muscle tone." 
-        },
-        'none': {
-            color: '150, 150, 150',
-            text: "Whole Brain View",
-            detail: "The brain acts like a supercomputer. Select a region to explore."
-        }
+        return { scene, camera, renderer, controls };
     };
 
-    function resize() {
-        width = canvas.parentElement.offsetWidth;
-        height = canvas.parentElement.offsetHeight;
-        canvas.width = width;
-        canvas.height = height;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    // --- MATERIAL (Wireframe Sketch Style) ---
+    // Black lines on white background for that "Technical Diagram" feel
+    const sketchMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x111111, 
+        wireframe: true, 
+        transparent: true, 
+        opacity: 0.15 
+    });
+    
+    // Highlight material for interaction
+    const highlightMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x000000, 
+        wireframe: true, 
+        transparent: true, 
+        opacity: 0.8 
+    });
 
-    // Create Brain Geometry with Lobe Assignment
-    function createBrain() {
-        for (let i = 0; i < numParticles; i++) {
-            let u = Math.random();
-            let v = Math.random();
-            const theta = 2 * Math.PI * u;
-            const phi = Math.acos(2 * v - 1);
+    // --- 1. PEA SCENE ---
+    (() => {
+        const { scene, camera, renderer, controls } = initScene('container-pea');
+        
+        // Sphere representing the Pea/Atom/Galaxy
+        // We use Icosahedron for a more organic, less perfect sphere look
+        const geometry = new THREE.IcosahedronGeometry(3, 2);
+        const pea = new THREE.Mesh(geometry, sketchMaterial);
+        
+        // Inner "Core" representing the atom
+        const coreGeo = new THREE.IcosahedronGeometry(1, 1);
+        const core = new THREE.Mesh(coreGeo, sketchMaterial);
+        pea.add(core);
+
+        scene.add(pea);
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            // Rotate based on scroll + idle
+            pea.rotation.y += 0.002;
+            pea.rotation.x = window.scrollY * 0.001;
             
-            let r = 1; 
-            let x = r * Math.sin(phi) * Math.cos(theta);
-            let y = r * Math.sin(phi) * Math.sin(theta);
-            let z = r * Math.cos(phi);
+            if(controls) controls.update();
+            renderer.render(scene, camera);
+        };
+        animate();
+    })();
 
-            // Morph sphere into brain shape
-            x += (x > 0 ? 0.05 : -0.05); // Hemisphere gap
-            z *= 1.3; // Elongate
-            if(y > 0.4) y *= 0.8; // Flatten bottom
+    // --- 2. BRAIN SCENE ---
+    (() => {
+        const { scene, camera, renderer, controls } = initScene('container-brain');
+        const brainGroup = new THREE.Group();
 
-            // Assign Lobes based on position
-            let lobe = 'subcortical';
-            
-            if (y > 0.3 && z < -0.5) lobe = 'cerebellum';
-            else if (z > 0.2 && y < 0) lobe = 'frontal';
-            else if (z < -0.6 && y < 0) lobe = 'occipital';
-            else if (y > 0.1) lobe = 'temporal';
-            else lobe = 'parietal';
+        // Helper to create brain parts
+        // We approximate lobes using scaled spheres
+        const createLobe = (scale, pos, name, desc) => {
+            const geo = new THREE.SphereGeometry(1, 16, 16);
+            const mesh = new THREE.Mesh(geo, sketchMaterial.clone());
+            mesh.scale.set(scale.x, scale.y, scale.z);
+            mesh.position.set(pos.x, pos.y, pos.z);
+            mesh.userData = { name, desc };
+            return mesh;
+        };
 
-            particles.push({x, y, z, lobe});
-        }
-    }
-    createBrain();
+        // Constructing the Brain Architecture
+        // Frontal Lobe (Planning)
+        const frontalL = createLobe({x:1.5, y:2, z:2}, {x:-1.5, y:1, z:1}, "Frontal Lobe (L)", "Logic, planning, execution.");
+        const frontalR = createLobe({x:1.5, y:2, z:2}, {x:1.5, y:1, z:1}, "Frontal Lobe (R)", "Logic, planning, execution.");
 
-    function setLobe(lobe) {
-        currentLobe = lobe;
-        const info = document.getElementById('brain-info');
-        const data = lobeData[lobe];
+        // Parietal Lobe (Touch/Space)
+        const parietalL = createLobe({x:1.4, y:1.8, z:1.8}, {x:-1.6, y:2.5, z:-1.5}, "Parietal Lobe (L)", "Sensory processing, spatial awareness.");
+        const parietalR = createLobe({x:1.4, y:1.8, z:1.8}, {x:1.6, y:2.5, z:-1.5}, "Parietal Lobe (R)", "Sensory processing, spatial awareness.");
+
+        // Temporal Lobe (Sound/Memory)
+        const temporalL = createLobe({x:1.2, y:1.5, z:2.2}, {x:-2.8, y:-1, z:0.5}, "Temporal Lobe (L)", "Auditory processing, memory encoding.");
+        const temporalR = createLobe({x:1.2, y:1.5, z:2.2}, {x:2.8, y:-1, z:0.5}, "Temporal Lobe (R)", "Auditory processing, memory encoding.");
+
+        // Occipital Lobe (Vision)
+        const occipitalL = createLobe({x:1.2, y:1.5, z:1.5}, {x:-1, y:0, z:-3}, "Occipital Lobe (L)", "Visual processing center.");
+        const occipitalR = createLobe({x:1.2, y:1.5, z:1.5}, {x:1, y:0, z:-3}, "Occipital Lobe (R)", "Visual processing center.");
+
+        // Cerebellum
+        const cerebellum = createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Motor control, balance, coordination.");
         
-        // Update Buttons
-        document.querySelectorAll('.brain-btn').forEach(btn => btn.classList.remove('active'));
-        if(lobe !== 'none') document.querySelector(`.btn-${lobe}`).classList.add('active');
+        // Brain Stem
+        const stemGeo = new THREE.CylinderGeometry(0.8, 0.6, 4, 16);
+        const stem = new THREE.Mesh(stemGeo, sketchMaterial.clone());
+        stem.position.set(0, -3, 0);
+        stem.rotation.x = 0.2;
+        stem.userData = { name: "Brain Stem", desc: "Basic life functions (breathing, heart rate)." };
 
-        // Update Text
-        info.innerHTML = `<span class="sub-detail" style="color:rgb(${data.color})">${data.text}</span>${data.detail}`;
+        brainGroup.add(frontalL, frontalR, parietalL, parietalR, temporalL, temporalR, occipitalL, occipitalR, cerebellum, stem);
+        scene.add(brainGroup);
 
-        // Set Zoom Target
-        if (lobe === 'none') {
-            targetZoom = 1;
-            targetAngleY = -1.5; // Reset rotation
-            targetAngleX = 0;
-        } else {
-            targetZoom = 1.8; // Zoom in
-        }
-    }
+        // Interaction Logic
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const tooltip = document.getElementById('brain-tooltip');
+        const ttTitle = document.getElementById('bt-title');
+        const ttDesc = document.getElementById('bt-desc');
+        let hoveredObj = null;
 
-    function project(p, rotX, rotY) {
-        // Rotation Matrix Y
-        let x1 = p.x * Math.cos(rotY) - p.z * Math.sin(rotY);
-        let z1 = p.x * Math.sin(rotY) + p.z * Math.cos(rotY);
-        let y1 = p.y;
+        const onMouseMove = (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-        // Rotation Matrix X
-        let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
-        let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
-        let x2 = x1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(brainGroup.children);
 
-        // Perspective
-        const fov = 400;
-        const scale = (fov / (fov + z2 * 100 + 300)) * zoomLevel; 
-        
-        const x2d = x2 * 100 * scale + width / 2;
-        const y2d = y2 * 100 * scale + height / 2;
-
-        return { x: x2d, y: y2d, scale: scale, z: z2, lobe: p.lobe };
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, width, height);
-
-        if (!isDragging && currentLobe === 'none') {
-            targetAngleY += 0.002; 
-        }
-        
-        // Smooth transitions
-        angleX += (targetAngleX - angleX) * 0.1;
-        angleY += (targetAngleY - angleY) * 0.1;
-        zoomLevel += (targetZoom - zoomLevel) * 0.1;
-
-        const projectedPoints = particles.map(p => project(p, angleX, angleY));
-        
-        // Sorting for depth
-        projectedPoints.sort((a, b) => b.z - a.z);
-
-        // Draw Particles
-        projectedPoints.forEach(p => {
-            let alpha = 0.4;
-            let color = '150,150,150'; // Default Grey
-
-            if (currentLobe !== 'none') {
-                if (p.lobe === currentLobe) {
-                    alpha = 1;
-                    color = lobeData[currentLobe].color;
-                } else {
-                    alpha = 0.05; // Fade out others
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                if (hoveredObj !== obj) {
+                    // Reset previous
+                    if (hoveredObj) hoveredObj.material = sketchMaterial;
+                    
+                    // Highlight new
+                    hoveredObj = obj;
+                    hoveredObj.material = highlightMaterial;
+                    
+                    // Update Tooltip
+                    ttTitle.innerText = hoveredObj.userData.name;
+                    ttDesc.innerText = hoveredObj.userData.desc;
+                    tooltip.style.display = 'block';
                 }
             } else {
-                 // Slight color hint in default mode based on depth
-                 alpha = 0.5 + (p.scale * 0.2); 
-            }
-
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(${color}, ${alpha})`;
-            ctx.arc(p.x, p.y, 2 * p.scale, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        
-        // Draw Connectors only for active lobe
-        if (currentLobe !== 'none') {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(${lobeData[currentLobe].color}, 0.2)`;
-            ctx.lineWidth = 1;
-            
-            for(let i=0; i<projectedPoints.length; i+=5) {
-                let p1 = projectedPoints[i];
-                if(p1.lobe === currentLobe) {
-                    // find a neighbor
-                    if(i + 1 < projectedPoints.length && projectedPoints[i+1].lobe === currentLobe) {
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(projectedPoints[i+1].x, projectedPoints[i+1].y);
-                    }
+                if (hoveredObj) {
+                    hoveredObj.material = sketchMaterial;
+                    hoveredObj = null;
+                    tooltip.style.display = 'none';
                 }
             }
-            ctx.stroke();
-        }
+        };
 
-        requestAnimationFrame(animate);
-    }
+        document.getElementById('container-brain').addEventListener('mousemove', onMouseMove);
 
-    animate();
+        const animate = () => {
+            requestAnimationFrame(animate);
+            // Scroll rotation
+            brainGroup.rotation.y = window.scrollY * 0.002; 
+            brainGroup.rotation.x = Math.sin(window.scrollY * 0.001) * 0.1;
+            
+            if(controls) controls.update();
+            renderer.render(scene, camera);
+        };
+        animate();
+    })();
 
-    // Mouse Events
-    const brainContainer = document.getElementById('brain-container');
+    // --- 3. ATP SCENE ---
+    (() => {
+        const { scene, camera, renderer, controls } = initScene('container-atp');
+        
+        const atpGroup = new THREE.Group();
 
-    brainContainer.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-    });
+        // Stator (Cylinder)
+        const cylGeo = new THREE.CylinderGeometry(1.5, 1.5, 4, 32, 4, true);
+        const cyl = new THREE.Mesh(cylGeo, sketchMaterial);
+        
+        // Rotor (Turbine head - Torus)
+        const torusGeo = new THREE.TorusGeometry(2.5, 0.5, 16, 50);
+        const rotor = new THREE.Mesh(torusGeo, sketchMaterial);
+        rotor.rotation.x = Math.PI / 2;
+        rotor.position.y = 2;
 
-    window.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
+        atpGroup.add(cyl);
+        atpGroup.add(rotor);
+        scene.add(atpGroup);
 
-    brainContainer.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const deltaX = e.clientX - lastMouseX;
-            const deltaY = e.clientY - lastMouseY;
-            targetAngleY += deltaX * 0.01;
-            targetAngleX += deltaY * 0.01;
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
-        }
-    });
-
-    brainContainer.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        lastMouseX = e.touches[0].clientX;
-        lastMouseY = e.touches[0].clientY;
-    }, {passive: false});
-
-    brainContainer.addEventListener('touchmove', (e) => {
-        if (isDragging) {
-            const deltaX = e.touches[0].clientX - lastMouseX;
-            const deltaY = e.touches[0].clientY - lastMouseY;
-            targetAngleY += deltaX * 0.01;
-            targetAngleX += deltaY * 0.01;
-            lastMouseX = e.touches[0].clientX;
-            lastMouseY = e.touches[0].clientY;
-            e.preventDefault();
-        }
-    }, {passive: false});
+        const animate = () => {
+            requestAnimationFrame(animate);
+            // Mechanical rotation
+            rotor.rotation.z += 0.05;
+            // Scroll interaction
+            atpGroup.rotation.y = window.scrollY * 0.003;
+            atpGroup.rotation.z = 0.2; // Slight tilt
+            
+            if(controls) controls.update();
+            renderer.render(scene, camera);
+        };
+        animate();
+    })();
 
 </script>
 
