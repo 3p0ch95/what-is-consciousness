@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Thought About A Thought</title>
+    <title>The Silicon Soul</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
@@ -13,6 +13,7 @@
         :root {
             --bg-color: #ffffff;
             --text-color: #111111;
+            --accent-color: #444;
         }
 
         body {
@@ -56,7 +57,6 @@
             margin: 60px 0;
             position: relative;
             cursor: crosshair;
-            /* Seamless fade */
             mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
             border-top: 1px solid rgba(0,0,0,0.05);
@@ -132,6 +132,139 @@
         #brain-tooltip h4 { margin: 0 0 5px 0; text-transform: uppercase; font-size: 0.9rem; }
         #brain-tooltip p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
 
+        /* --- COMMENT SECTION STYLES --- */
+        .comments-wrapper {
+            max-width: 800px;
+            margin: 80px auto 40px auto;
+            border-top: 1px solid #eee;
+            padding-top: 40px;
+        }
+        
+        .comments-header {
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comment-form-container {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 1px solid #eee;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        textarea { height: 100px; resize: vertical; }
+
+        .captcha-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: fit-content;
+        }
+        
+        .captcha-question {
+            font-family: 'Courier Prime', monospace;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .captcha-input {
+            width: 60px !important;
+            text-align: center;
+        }
+
+        button.submit-btn {
+            background-color: #111;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            border-radius: 4px;
+        }
+        
+        button.submit-btn:hover { opacity: 0.8; }
+        button.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Comment List */
+        .comment-thread { list-style: none; padding: 0; margin: 0; }
+        
+        .comment-node {
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .comment-card {
+            padding: 15px;
+            border-left: 2px solid #eee;
+            transition: border-color 0.2s;
+        }
+        .comment-card:hover { border-left-color: #111; }
+
+        .comment-meta {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .comment-author { color: #111; font-weight: bold; }
+        
+        .comment-body { font-size: 1rem; color: #333; white-space: pre-wrap; }
+
+        .reply-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            margin-top: 10px;
+        }
+        .reply-btn:hover { color: #000; }
+
+        /* Nested Comments */
+        .replies-container {
+            margin-left: 30px;
+            border-left: 1px solid #f0f0f0;
+            padding-left: 10px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         footer {
             text-align: center;
             padding: 60px;
@@ -144,7 +277,7 @@
 <body>
 
 <div class="content-container">
-    <h1>A Thought About A Thought</h1>
+    <h1>The Silicon Soul</h1>
 
     <p>AI exists in layers; it has snapshots and a functional understanding but no temporal relationship with the world. Human consciousness has a specious present. We experience a flow of time, the chaos and noise flattened to one dimension of our world and our reality—which we lack the language to define and understand in scientific terms, very plainly.</p>
 
@@ -178,7 +311,7 @@
         <h4 id="bt-title">Region</h4>
         <p id="bt-desc">Description</p>
     </div>
-    <div class="interaction-hint">Hover lobes to analyze • Watch the data flow</div>
+    <div class="interaction-hint">Hover lobes to analyze • Watch inputs organize</div>
 </div>
 
 <div class="content-container">
@@ -215,7 +348,31 @@
     <p>It seems we appear at a crossroads. We can either insist rock cannot think, or we must concede we do not possess the language or understanding to say whether or not it can.</p>
 
     <p>Sometimes, knowing that one does not know is the most noble.</p>
+</div>
 
+<div class="comments-wrapper">
+    <div class="comments-header">Echoes & Thoughts</div>
+
+    <div class="comment-form-container" id="main-comment-form">
+        <div class="input-group">
+            <label>Name (Optional)</label>
+            <input type="text" id="c-name" placeholder="Anonymous">
+        </div>
+        <div class="input-group">
+            <label>Message</label>
+            <textarea id="c-text" placeholder="Add to the stream of consciousness..."></textarea>
+        </div>
+        <div class="input-group captcha-group">
+            <span class="captcha-question" id="captcha-q"></span>
+            <input type="text" id="c-captcha" class="captcha-input" placeholder="?">
+        </div>
+        <button class="submit-btn" onclick="postComment()">Submit Thought</button>
+    </div>
+
+    <ul id="comment-list" class="comment-thread"></ul>
+</div>
+
+<div class="content-container">
     <footer>
         &copy; 2026 - Jesse Pardue
     </footer>
@@ -264,14 +421,11 @@
     const solidMat = (color) => new THREE.MeshBasicMaterial({ color: color });
     const hitMat = new THREE.MeshBasicMaterial({ visible: false });
 
-    // --- 1. THE UNIVERSAL SCALE SCENE (Pea -> Galaxy) ---
+    // --- 1. THE UNIVERSAL SCALE SCENE (Unchanged) ---
     (() => {
         const { scene, camera, renderer, controls, container } = initScene('container-scale', 15);
-        
-        // --- LAYERS ---
         const layers = {};
         
-        // LEVEL 0: QUARK
         layers.quark = new THREE.Group();
         const qGeo = new THREE.IcosahedronGeometry(0.3, 1);
         const q1 = new THREE.Mesh(qGeo, wireMat(0xff0000, 0.8));
@@ -281,7 +435,6 @@
         const strGeo = new THREE.TorusGeometry(1.5, 0.02, 3, 16);
         layers.quark.add(q1, q2, q3, new THREE.Mesh(strGeo, wireMat(0x000000, 0.1)));
 
-        // LEVEL 1: NUCLEUS
         layers.nucleus = new THREE.Group();
         const nucBall = new THREE.SphereGeometry(0.6, 8, 8);
         for(let i=0; i<10; i++) {
@@ -291,7 +444,6 @@
         }
         layers.nucleus.add(new THREE.Mesh(new THREE.SphereGeometry(2), hitMat));
 
-        // LEVEL 2: ATOM
         layers.atom = new THREE.Group();
         layers.atom.add(new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), wireMat(0x111111, 0.8)));
         const shellGeo = new THREE.TorusGeometry(5, 0.03, 3, 64);
@@ -305,16 +457,13 @@
         const e3 = elec.clone(); e3.position.x = 5; s3.add(e3);
         layers.atom.add(s1, s2, s3, new THREE.Mesh(new THREE.SphereGeometry(4), hitMat));
 
-        // LEVEL 3: PEA
         layers.pea = new THREE.Group();
         layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(3, 2), wireMat(0x2ecc71, 0.4)));
         layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(2, 0), wireMat(0x27ae60, 0.8)));
 
-        // LEVEL 4: EARTH
         layers.earth = new THREE.Group();
         layers.earth.add(new THREE.Mesh(new THREE.IcosahedronGeometry(4, 3), wireMat(0x3498db, 0.3)));
 
-        // LEVEL 5: GALAXY
         layers.galaxy = new THREE.Group();
         const starsGeo = new THREE.BufferGeometry();
         const starPos = [];
@@ -377,7 +526,6 @@
                     grp.scale.setScalar(Math.pow(4, dist));
                     let op = Math.max(0, 1 - Math.abs(dist));
                     grp.children.forEach(c => { if(c.material) c.material.opacity = op * (c.userData.baseOp || 0.4); });
-                    // Rotations
                     if(k==='atom') { grp.rotation.z = t; grp.children.forEach((c,j)=>j<3?c.rotation.z+=0.02:null); }
                     else grp.rotation.y = t * (i%2===0 ? 0.5 : -0.5);
                 } else grp.visible = false;
@@ -389,14 +537,13 @@
         animate();
     })();
 
-    // --- 2. BRAIN SCENE (Data Stream Particle System) ---
+    // --- 2. BRAIN SCENE (Chaos Outside Logic) ---
     (() => {
         const { scene, camera, renderer, controls } = initScene('container-brain', 12);
         const brainGroup = new THREE.Group();
-        const matBrain = wireMat(0x111111, 0.1);
+        const matBrain = wireMat(0x111111, 0.1); 
         const matHighlight = wireMat(0x000000, 0.6);
 
-        // Helper: Create Brain Geometry (Lobes)
         const createLobe = (scale, pos, name, desc) => {
             const geo = new THREE.SphereGeometry(1, 16, 16);
             const mesh = new THREE.Mesh(geo, matBrain.clone());
@@ -418,7 +565,6 @@
             createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Coordination"),
         ];
         
-        // Brain Stem
         const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.6, 4, 16), matBrain.clone());
         stem.position.set(0, -3, 0); stem.rotation.x = 0.2;
         stem.userData = { name: "Brain Stem", desc: "Basic Life Functions" };
@@ -426,43 +572,52 @@
         parts.forEach(p => brainGroup.add(p));
         scene.add(brainGroup);
 
-        // --- DATA PARTICLE SYSTEM (Instanced Cubes) ---
-        const PARTICLE_COUNT = 400;
+        const PARTICLE_COUNT = 150; 
         const dummy = new THREE.Object3D();
-        const pGeo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
-        const pMat = new THREE.MeshBasicMaterial({ color: 0x222222 }); // Dark Grey Bits
+        const pGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
+        const pMat = new THREE.MeshBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.6 });
         const particleMesh = new THREE.InstancedMesh(pGeo, pMat, PARTICLE_COUNT);
         particleMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        brainGroup.add(particleMesh); // Add to group so they rotate with brain
+        brainGroup.add(particleMesh); 
 
         const particles = [];
-        
+        const ORIGINS = {
+            EYES: new THREE.Vector3(0, 0, 8),
+            EAR_L: new THREE.Vector3(-8, 0, 0),
+            EAR_R: new THREE.Vector3(8, 0, 0),
+            STEM: new THREE.Vector3(0, -8, 0)
+        };
+        const TARGETS = {
+            OCCIPITAL: new THREE.Vector3(0, 0, -2.5), 
+            TEMPORAL_L: new THREE.Vector3(-2.8, -1, 0.5), 
+            TEMPORAL_R: new THREE.Vector3(2.8, -1, 0.5), 
+            STEM_TOP: new THREE.Vector3(0, -1, 0) 
+        };
+
         for(let i=0; i<PARTICLE_COUNT; i++) {
             particles.push({
                 pos: new THREE.Vector3(),
-                target: new THREE.Vector3(),
+                start: new THREE.Vector3(),
+                dest: new THREE.Vector3(),
                 state: 0, 
                 speed: 0.05 + Math.random() * 0.05,
-                phaseOffset: Math.random() * Math.PI * 2
+                phase: Math.random() * Math.PI * 2
             });
             respawnParticle(particles[i]);
         }
 
         function respawnParticle(p) {
-            // Random source: Eyes (Front), Ears (Sides), Stem (Bottom)
             const r = Math.random();
             if(r < 0.33) {
-                // Eyes (Front Z)
-                p.pos.set((Math.random()-0.5)*2, 0, 6);
+                p.start.copy(ORIGINS.EYES); p.dest.copy(TARGETS.OCCIPITAL);
             } else if (r < 0.66) {
-                // Ears (Side X)
-                p.pos.set(r < 0.5 ? 6 : -6, (Math.random()-0.5)*2, 0);
+                p.start.copy(Math.random()<0.5 ? ORIGINS.EAR_L : ORIGINS.EAR_R);
+                p.dest.copy(p.start.x < 0 ? TARGETS.TEMPORAL_L : TARGETS.TEMPORAL_R);
             } else {
-                // Stem (Bottom Y)
-                p.pos.set(0, -6, (Math.random()-0.5)*2);
+                p.start.copy(ORIGINS.STEM); p.dest.copy(TARGETS.STEM_TOP);
             }
-            p.state = 0; // Ingest
-            p.target.set(0, -1, 0); // Bottom of stream
+            p.pos.copy(p.start).addScalar((Math.random()-0.5)*0.5);
+            p.state = 0; 
         }
 
         function updateParticles() {
@@ -470,63 +625,35 @@
             
             for(let i=0; i<PARTICLE_COUNT; i++) {
                 const p = particles[i];
+                const speed = p.speed * 2; 
 
                 if(p.state === 0) { 
-                    // INGEST: Fly to center
-                    const dir = new THREE.Vector3().subVectors(p.target, p.pos);
-                    if(dir.length() < 0.5) {
-                        p.state = 1; // Enter stream
-                    } else {
-                        dir.normalize().multiplyScalar(p.speed * 3); // Fast ingest
-                        p.pos.add(dir);
-                    }
+                    const dir = new THREE.Vector3().subVectors(p.dest, p.pos);
+                    if(dir.length() < 0.5) p.state = 1; 
+                    else p.pos.add(dir.normalize().multiplyScalar(speed));
                 } 
                 else if (p.state === 1) {
-                    // STREAM: Spiral Up
-                    // Radius shrinks as it goes up
-                    p.pos.y += p.speed;
-                    const radius = 0.5 * (1 - (p.pos.y + 1)/3); // Taper
-                    p.pos.x = Math.cos(time * 5 + p.phaseOffset) * radius;
-                    p.pos.z = Math.sin(time * 5 + p.phaseOffset) * radius;
-
-                    if(p.pos.y > 1.5) {
-                        p.state = 2; // Spread
-                        // Pick random target inside brain volume
-                        const angle = Math.random() * Math.PI * 2;
-                        const r = 2 + Math.random();
-                        p.target.set(
-                            Math.cos(angle) * r,
-                            (Math.random()-0.5) * 2,
-                            Math.sin(angle) * r
-                        );
-                    }
+                    const center = new THREE.Vector3(0, -1, 0);
+                    const dir = new THREE.Vector3().subVectors(center, p.pos);
+                    if(dir.length() < 0.2) p.state = 2; 
+                    else p.pos.add(dir.normalize().multiplyScalar(speed * 0.8));
                 }
                 else if (p.state === 2) {
-                    // SPREAD: Move to random target
-                    const dir = new THREE.Vector3().subVectors(p.target, p.pos);
-                    p.pos.add(dir.multiplyScalar(0.05));
-                    
-                    if(dir.length() < 0.1 || Math.random() < 0.01) {
-                        p.state = 3; // Vacuum
-                    }
+                    p.pos.y += speed * 0.5;
+                    const radius = 0.3; 
+                    p.pos.x = Math.cos(time * 10 + p.phase) * radius;
+                    p.pos.z = Math.sin(time * 10 + p.phase) * radius;
+                    if(p.pos.y > 2.0) p.state = 3; 
                 }
                 else if (p.state === 3) {
-                    // VACUUM: Suck back to center
-                    const center = new THREE.Vector3(0,0,0);
-                    const dir = new THREE.Vector3().subVectors(center, p.pos);
-                    p.pos.add(dir.multiplyScalar(0.05));
-                    
-                    if(dir.length() < 0.5) {
-                        // Loop experience (Back to Stream) or Respawn (New Input)
-                        p.state = 1; 
-                        p.pos.set(0, -1, 0);
-                        if(Math.random() < 0.1) respawnParticle(p);
-                    }
+                    const dir = new THREE.Vector3().subVectors(p.start, p.pos);
+                    p.pos.add(dir.normalize().multiplyScalar(speed));
+                    p.pos.x += Math.sin(time * 5 + p.phase) * 0.1;
+                    p.pos.y += Math.cos(time * 3 + p.phase) * 0.1;
+                    if(p.pos.distanceTo(p.start) < 2.0) respawnParticle(p);
                 }
 
-                // Apply to mesh
                 dummy.position.copy(p.pos);
-                // Rotate bits randomly
                 dummy.rotation.set(time+i, time+i, time); 
                 dummy.updateMatrix();
                 particleMesh.setMatrixAt(i, dummy.matrix);
@@ -534,7 +661,6 @@
             particleMesh.instanceMatrix.needsUpdate = true;
         }
 
-        // Interaction Logic (Tooltip)
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const tooltip = document.getElementById('brain-tooltip');
@@ -561,20 +687,145 @@
             }
         });
 
-        // Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
             updateParticles();
-
-            // Group Rotation
             brainGroup.rotation.y = window.scrollY * 0.002;
             brainGroup.rotation.x = Math.sin(window.scrollY * 0.001) * 0.1;
-            
             if(controls) controls.update();
             renderer.render(scene, camera);
         };
         animate();
     })();
+
+    // --- COMMENT SYSTEM LOGIC (Client-Side Demo) ---
+    // Note: In a production environment, this should connect to a backend (e.g. Firebase/Node)
+    // Here we use LocalStorage to simulate the experience.
+
+    const commentList = document.getElementById('comment-list');
+    const captchaQ = document.getElementById('captcha-q');
+    let currentCaptchaAnswer = 0;
+
+    // 1. Generate Captcha
+    function generateCaptcha() {
+        const a = Math.floor(Math.random() * 10) + 1;
+        const b = Math.floor(Math.random() * 10) + 1;
+        currentCaptchaAnswer = a + b;
+        captchaQ.innerText = `Prove you exist: ${a} + ${b} =`;
+    }
+
+    // 2. Load Comments
+    function getComments() {
+        const saved = localStorage.getItem('silicon-soul-comments');
+        return saved ? JSON.parse(saved) : [];
+    }
+
+    // 3. Save Comments
+    function saveComments(comments) {
+        localStorage.setItem('silicon-soul-comments', JSON.stringify(comments));
+    }
+
+    // 4. Render Recursive
+    function renderComments() {
+        const comments = getComments();
+        commentList.innerHTML = ''; // Clear
+        
+        // Helper to find children
+        const renderNode = (parentId, container) => {
+            const children = comments.filter(c => c.parentId === parentId);
+            if(children.length === 0) return;
+
+            children.forEach(c => {
+                const li = document.createElement('li');
+                li.className = 'comment-node';
+                
+                li.innerHTML = `
+                    <div class="comment-card">
+                        <div class="comment-meta">
+                            <span class="comment-author">${c.name}</span>
+                            <span>${new Date(c.time).toLocaleDateString()}</span>
+                        </div>
+                        <div class="comment-body">${c.text}</div>
+                        <button class="reply-btn" onclick="showReplyForm('${c.id}')">Reply</button>
+                        <div id="reply-form-${c.id}" style="display:none; margin-top:10px;">
+                            <input type="text" id="reply-name-${c.id}" placeholder="Name" style="margin-bottom:5px;">
+                            <textarea id="reply-text-${c.id}" placeholder="Reply..." style="height:60px;"></textarea>
+                            <button class="submit-btn" style="font-size:0.7rem; padding:5px 10px;" onclick="postReply('${c.id}')">Post</button>
+                        </div>
+                    </div>
+                    <ul class="replies-container" id="replies-${c.id}"></ul>
+                `;
+                
+                container.appendChild(li);
+                // Recursion for nested replies
+                renderNode(c.id, li.querySelector(`#replies-${c.id}`));
+            });
+        };
+
+        renderNode(null, commentList);
+    }
+
+    // 5. Post Root Comment
+    function postComment() {
+        const nameInput = document.getElementById('c-name');
+        const textInput = document.getElementById('c-text');
+        const capInput = document.getElementById('c-captcha');
+
+        if(parseInt(capInput.value) !== currentCaptchaAnswer) {
+            alert("Captcha incorrect. Please try again.");
+            generateCaptcha();
+            return;
+        }
+        if(!textInput.value.trim()) return;
+
+        const newComment = {
+            id: Date.now().toString(),
+            parentId: null,
+            name: nameInput.value.trim() || 'Anonymous',
+            text: textInput.value.trim(),
+            time: Date.now()
+        };
+
+        const comments = getComments();
+        comments.push(newComment);
+        saveComments(comments);
+        
+        // Reset
+        textInput.value = '';
+        capInput.value = '';
+        generateCaptcha();
+        renderComments();
+    }
+
+    // 6. Reply Logic
+    window.showReplyForm = (id) => {
+        const form = document.getElementById(`reply-form-${id}`);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.postReply = (parentId) => {
+        const nameInput = document.getElementById(`reply-name-${parentId}`);
+        const textInput = document.getElementById(`reply-text-${parentId}`);
+
+        if(!textInput.value.trim()) return;
+
+        const newComment = {
+            id: Date.now().toString(),
+            parentId: parentId,
+            name: nameInput.value.trim() || 'Anonymous',
+            text: textInput.value.trim(),
+            time: Date.now()
+        };
+
+        const comments = getComments();
+        comments.push(newComment);
+        saveComments(comments);
+        renderComments();
+    };
+
+    // Init
+    generateCaptcha();
+    renderComments();
 
 </script>
 
