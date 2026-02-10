@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Thought on Thoughts</title>
+    <title>The Silicon Soul</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
@@ -13,7 +13,6 @@
         :root {
             --bg-color: #ffffff;
             --text-color: #111111;
-            --accent-color: #333333;
         }
 
         body {
@@ -53,13 +52,16 @@
         /* 3D Visual Containers */
         .visual-container {
             width: 100%;
-            height: 500px;
+            height: 600px; 
             margin: 60px 0;
             position: relative;
-            cursor: move; /* Indicates interactability */
-            /* Seamless fade at top/bottom edges */
+            cursor: crosshair;
+            /* Seamless fade */
             mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            user-select: none;
         }
 
         canvas {
@@ -74,11 +76,42 @@
             transform: translateX(-50%);
             font-family: 'Courier Prime', monospace;
             font-size: 0.8rem;
-            color: #888;
+            color: #555;
             pointer-events: none;
-            background: rgba(255,255,255,0.8);
-            padding: 5px 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 12px;
             border-radius: 4px;
+            border: 1px solid #ddd;
+            text-align: center;
+            z-index: 20;
+        }
+
+        /* Scale Slider / UI */
+        .scale-ui {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            z-index: 20;
+            text-align: center;
+        }
+
+        .scale-label {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
         }
 
         /* Tooltip for the Brain */
@@ -94,6 +127,7 @@
             display: none;
             pointer-events: none;
             box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            z-index: 30;
         }
         #brain-tooltip h4 { margin: 0 0 5px 0; text-transform: uppercase; font-size: 0.9rem; }
         #brain-tooltip p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
@@ -121,8 +155,12 @@
     <p>Take the Hitler/Jesus game on Wikipedia for example; anything exists a few clicks away from another. Concepts are connected both broadly and explicitly.</p>
 </div>
 
-<div id="container-pea" class="visual-container">
-    <div class="interaction-hint">Scroll to Rotate • Drag to Inspect</div>
+<div id="container-scale" class="visual-container">
+    <div class="scale-ui">
+        <span id="scale-text" class="scale-label">SCALE: THE PEA</span>
+        <input type="range" id="scale-slider" min="0" max="5" step="0.01" value="3">
+    </div>
+    <div class="interaction-hint">Click Objects to Zoom In • Click Background to Zoom Out</div>
 </div>
 
 <div class="content-container">
@@ -151,13 +189,7 @@
     <p>What makes us different from an ant, if so much of us are all the same? We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness, likely the ant has no concept of the broader good it will do while it the ant marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
 
     <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce. Will the cell reproduce. Will the hydrogen ion force the ATP synthase turbine to turn, will the oxygen accept the hydrogen?</p>
-</div>
 
-<div id="container-atp" class="visual-container">
-    <div class="interaction-hint">The Engine of Life: F1-ATPase</div>
-</div>
-
-<div class="content-container">
     <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers. All marching to the same drum, observing it differently.</p>
     
     <p>What is so different than the electron in the transistor thirty times over in the infinite complexity of a chip, flipping bits—the beauty of the baud—to a number in a program, abstracted into a video from a million different pixels. What is it that could give rise to thought? The video seems inorganic in a way that I would say steel is; but there is a fine fabric that intertwines everything.</p>
@@ -197,25 +229,23 @@
         const height = container.clientHeight;
 
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff); // White Seamless
+        scene.background = new THREE.Color(0xffffff);
 
         const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-        camera.position.z = 12;
+        camera.position.z = 15;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(width, height);
         container.appendChild(renderer.domElement);
 
-        // Add Controls if library loaded successfully
         let controls;
         if (typeof THREE.OrbitControls !== 'undefined') {
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.enableZoom = false;
+            controls.enableZoom = false; // Zoom handled manually for specific scene
         }
 
-        // Resize handler
         window.addEventListener('resize', () => {
             const w = container.clientWidth;
             const h = container.clientHeight;
@@ -224,101 +254,260 @@
             camera.updateProjectionMatrix();
         });
 
-        return { scene, camera, renderer, controls };
+        return { scene, camera, renderer, controls, container };
     };
 
-    // --- MATERIAL (Wireframe Sketch Style) ---
-    // Black lines on white background for that "Technical Diagram" feel
-    const sketchMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0x111111, 
-        wireframe: true, 
-        transparent: true, 
-        opacity: 0.15 
+    // --- MATERIALS (Wireframe + Color Splashes) ---
+    const wireMat = (color, opacity = 0.3) => new THREE.MeshBasicMaterial({ 
+        color: color, wireframe: true, transparent: true, opacity: opacity 
     });
-    
-    // Highlight material for interaction
-    const highlightMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0x000000, 
-        wireframe: true, 
-        transparent: true, 
-        opacity: 0.8 
-    });
+    const solidMat = (color) => new THREE.MeshBasicMaterial({ color: color });
+    // Invisible hit material for interactions
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
 
-    // --- 1. PEA SCENE ---
+    // --- 1. THE UNIVERSAL SCALE SCENE ---
     (() => {
-        const { scene, camera, renderer, controls } = initScene('container-pea');
+        const { scene, camera, renderer, controls, container } = initScene('container-scale');
         
-        // Sphere representing the Pea/Atom/Galaxy
-        // We use Icosahedron for a more organic, less perfect sphere look
-        const geometry = new THREE.IcosahedronGeometry(3, 2);
-        const pea = new THREE.Mesh(geometry, sketchMaterial);
+        // --- LAYERS ---
+        // 0: Quark, 1: Nucleus, 2: Atom, 3: Pea, 4: Earth, 5: Galaxy
+        const layers = {};
         
-        // Inner "Core" representing the atom
-        const coreGeo = new THREE.IcosahedronGeometry(1, 1);
-        const core = new THREE.Mesh(coreGeo, sketchMaterial);
-        pea.add(core);
+        // LEVEL 0: QUARK (RGB Vibrating)
+        layers.quark = new THREE.Group();
+        const qGeo = new THREE.IcosahedronGeometry(0.3, 1);
+        const q1 = new THREE.Mesh(qGeo, wireMat(0xff0000, 0.8)); // Red
+        const q2 = new THREE.Mesh(qGeo, wireMat(0x00ff00, 0.8)); // Green
+        const q3 = new THREE.Mesh(qGeo, wireMat(0x0000ff, 0.8)); // Blue
+        q1.position.set(0.5,0,0); q2.position.set(-0.4,0.4,0); q3.position.set(0,-0.5,0.2);
+        // String connections
+        const strGeo = new THREE.TorusGeometry(1.5, 0.02, 3, 16);
+        const str = new THREE.Mesh(strGeo, wireMat(0x000000, 0.1));
+        layers.quark.add(q1, q2, q3, str);
 
-        scene.add(pea);
+        // LEVEL 1: NUCLEUS (Protons/Neutrons)
+        layers.nucleus = new THREE.Group();
+        const nucBall = new THREE.SphereGeometry(0.6, 8, 8);
+        const matProt = wireMat(0xff3333, 0.6); // Redish
+        const matNeut = wireMat(0x3333ff, 0.6); // Bluish
+        for(let i=0; i<10; i++) {
+            const ball = new THREE.Mesh(nucBall, i%2==0 ? matProt : matNeut);
+            ball.position.set((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5);
+            layers.nucleus.add(ball);
+        }
+        // Hit target
+        const nucHit = new THREE.Mesh(new THREE.SphereGeometry(2), hitMat);
+        layers.nucleus.add(nucHit);
+
+        // LEVEL 2: ATOM (Electron Shells)
+        layers.atom = new THREE.Group();
+        // Core
+        const atomCore = new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), wireMat(0x111111, 0.8));
+        layers.atom.add(atomCore);
+        // Shells
+        const shellGeo = new THREE.TorusGeometry(5, 0.03, 3, 64);
+        const shellMat = wireMat(0x00ffff, 0.4); // Cyan
+        const s1 = new THREE.Mesh(shellGeo, shellMat);
+        const s2 = new THREE.Mesh(shellGeo, shellMat); s2.rotation.x = 1.5;
+        const s3 = new THREE.Mesh(shellGeo, shellMat); s3.rotation.y = 1.5;
+        // Electrons
+        const elec = new THREE.Mesh(new THREE.SphereGeometry(0.2,4,4), solidMat(0x00ffff));
+        const e1 = elec.clone(); e1.position.x = 5; s1.add(e1);
+        const e2 = elec.clone(); e2.position.x = 5; s2.add(e2);
+        const e3 = elec.clone(); e3.position.x = 5; s3.add(e3);
+        layers.atom.add(s1, s2, s3);
+        // Hit target
+        const atomHit = new THREE.Mesh(new THREE.SphereGeometry(4), hitMat);
+        layers.atom.add(atomHit);
+
+
+        // LEVEL 3: PEA (Green, Start Point)
+        layers.pea = new THREE.Group();
+        const peaGeo = new THREE.IcosahedronGeometry(3, 2);
+        const peaMat = wireMat(0x2ecc71, 0.4); // Emerald Green
+        const peaOuter = new THREE.Mesh(peaGeo, peaMat);
+        const peaInner = new THREE.Mesh(new THREE.IcosahedronGeometry(2, 0), wireMat(0x27ae60, 0.8));
+        layers.pea.add(peaOuter, peaInner);
+
+        // LEVEL 4: EARTH (Blue)
+        layers.earth = new THREE.Group();
+        const earthGeo = new THREE.IcosahedronGeometry(4, 3);
+        const earthMat = wireMat(0x3498db, 0.3); // Blue
+        layers.earth.add(new THREE.Mesh(earthGeo, earthMat));
+        layers.earth.add(new THREE.Mesh(new THREE.IcosahedronGeometry(4.1, 1), wireMat(0xffffff, 0.1))); // Clouds
+
+        // LEVEL 5: GALAXY (Purple Particles)
+        layers.galaxy = new THREE.Group();
+        const starsGeo = new THREE.BufferGeometry();
+        const starPos = [];
+        for(let i=0; i<1500; i++) {
+            const angle = i * 0.1;
+            const r = i * 0.02;
+            const x = Math.cos(angle) * r * 5;
+            const z = Math.sin(angle) * r * 5;
+            const y = (Math.random()-0.5) * r;
+            starPos.push(x, y, z);
+        }
+        starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        const stars = new THREE.Points(starsGeo, new THREE.PointsMaterial({color: 0x9b59b6, size: 0.15}));
+        layers.galaxy.add(stars);
+        // Galaxy Hit Target (Invisible sphere to ensure clicking works easily)
+        const galHit = new THREE.Mesh(new THREE.SphereGeometry(3), hitMat);
+        layers.galaxy.add(galHit);
+
+        // Add all to scene
+        Object.values(layers).forEach(g => scene.add(g));
+
+        // --- INTERACTION LOGIC ---
+        const slider = document.getElementById('scale-slider');
+        const label = document.getElementById('scale-text');
+        const labels = ["THE QUARK", "THE NUCLEUS", "THE ATOM", "THE PEA", "PLANET EARTH", "THE GALAXY"];
+        
+        let targetVal = 3; // Start at Pea
+        
+        // Raycaster for clicking
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            // Check intersection with current visible layer
+            const currentIdx = Math.round(targetVal);
+            const currentGroup = Object.values(layers)[currentIdx];
+            
+            // We need recursive checking for children
+            const intersects = raycaster.intersectObjects(currentGroup.children, true);
+            
+            if (intersects.length > 0) {
+                // Clicked object -> Zoom In (lower index)
+                if(targetVal > 0) targetVal = Math.floor(targetVal) - 1;
+            } else {
+                // Clicked BG -> Zoom Out (higher index)
+                if(targetVal < 5) targetVal = Math.ceil(targetVal) + 1;
+            }
+            slider.value = targetVal;
+        });
+
+        // Wheel Logic
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = Math.sign(e.deltaY); // +1 is down (Zoom Out)
+            targetVal += delta * 0.2;
+            targetVal = Math.max(0, Math.min(5, targetVal));
+            slider.value = targetVal;
+        }, {passive: false});
+
+        slider.addEventListener('input', (e) => {
+            targetVal = parseFloat(e.target.value);
+        });
+
+        const updateScene = () => {
+            // Smoothly display layers based on targetVal
+            const currentVal = parseFloat(slider.value);
+            
+            label.innerText = "SCALE: " + labels[Math.round(targetVal)];
+            
+            const layerKeys = ["quark", "nucleus", "atom", "pea", "earth", "galaxy"];
+            
+            layerKeys.forEach((key, idx) => {
+                const grp = layers[key];
+                const dist = idx - targetVal; 
+                
+                // Visibility window: +/- 1.5 units
+                if (Math.abs(dist) < 1.5) {
+                    grp.visible = true;
+                    
+                    // SCALE LOGIC: "Zooming In" means going from Index 3 -> 2.
+                    // If dist > 0 (idx > targetVal) -> Layer is larger than view (Background layer).
+                    // If dist < 0 (idx < targetVal) -> Layer is smaller than view (Inner layer).
+                    
+                    const scale = Math.pow(4, dist); 
+                    grp.scale.setScalar(scale);
+                    
+                    // OPACITY: Fade out as it gets too huge or too tiny
+                    let opacity = 1 - Math.abs(dist);
+                    opacity = Math.max(0, opacity);
+                    
+                    grp.children.forEach(c => {
+                        if(c.material) c.material.opacity = opacity * (c.userData.baseOp || 0.4);
+                        // Enhance brightness for active layer
+                        if(c.material && Math.abs(dist) < 0.2) c.material.opacity = 0.8; 
+                    });
+                    
+                } else {
+                    grp.visible = false;
+                }
+            });
+        };
 
         const animate = () => {
             requestAnimationFrame(animate);
-            // Rotate based on scroll + idle
-            pea.rotation.y += 0.002;
-            pea.rotation.x = window.scrollY * 0.001;
             
+            // Soft lerp of the slider value for animation
+            const currentSlider = parseFloat(slider.value);
+            if(Math.abs(targetVal - currentSlider) > 0.01) {
+                slider.value = currentSlider + (targetVal - currentSlider) * 0.1;
+                updateScene();
+            } else {
+                updateScene();
+            }
+
+            // Rotations
+            const t = Date.now() * 0.0005;
+            layers.quark.rotation.x = t*2;
+            layers.nucleus.rotation.y = -t;
+            layers.atom.rotation.z = t;
+            layers.atom.children.forEach((c,i) => { if(i>0) c.rotation.z += 0.02; }); // spin shells
+            layers.pea.rotation.y = t * 0.5;
+            layers.earth.rotation.y = t * 0.2;
+            layers.galaxy.rotation.y = t * 0.1;
+
             if(controls) controls.update();
             renderer.render(scene, camera);
         };
         animate();
     })();
 
-    // --- 2. BRAIN SCENE ---
+    // --- 2. BRAIN SCENE (Unchanged) ---
     (() => {
         const { scene, camera, renderer, controls } = initScene('container-brain');
         const brainGroup = new THREE.Group();
+        const matBrain = wireMat(0x111111, 0.15);
+        const matHighlight = wireMat(0x000000, 0.8);
 
-        // Helper to create brain parts
-        // We approximate lobes using scaled spheres
         const createLobe = (scale, pos, name, desc) => {
             const geo = new THREE.SphereGeometry(1, 16, 16);
-            const mesh = new THREE.Mesh(geo, sketchMaterial.clone());
+            const mesh = new THREE.Mesh(geo, matBrain.clone());
             mesh.scale.set(scale.x, scale.y, scale.z);
             mesh.position.set(pos.x, pos.y, pos.z);
             mesh.userData = { name, desc };
             return mesh;
         };
 
-        // Constructing the Brain Architecture
-        // Frontal Lobe (Planning)
         const frontalL = createLobe({x:1.5, y:2, z:2}, {x:-1.5, y:1, z:1}, "Frontal Lobe (L)", "Logic, planning, execution.");
         const frontalR = createLobe({x:1.5, y:2, z:2}, {x:1.5, y:1, z:1}, "Frontal Lobe (R)", "Logic, planning, execution.");
-
-        // Parietal Lobe (Touch/Space)
         const parietalL = createLobe({x:1.4, y:1.8, z:1.8}, {x:-1.6, y:2.5, z:-1.5}, "Parietal Lobe (L)", "Sensory processing, spatial awareness.");
         const parietalR = createLobe({x:1.4, y:1.8, z:1.8}, {x:1.6, y:2.5, z:-1.5}, "Parietal Lobe (R)", "Sensory processing, spatial awareness.");
-
-        // Temporal Lobe (Sound/Memory)
         const temporalL = createLobe({x:1.2, y:1.5, z:2.2}, {x:-2.8, y:-1, z:0.5}, "Temporal Lobe (L)", "Auditory processing, memory encoding.");
         const temporalR = createLobe({x:1.2, y:1.5, z:2.2}, {x:2.8, y:-1, z:0.5}, "Temporal Lobe (R)", "Auditory processing, memory encoding.");
-
-        // Occipital Lobe (Vision)
         const occipitalL = createLobe({x:1.2, y:1.5, z:1.5}, {x:-1, y:0, z:-3}, "Occipital Lobe (L)", "Visual processing center.");
         const occipitalR = createLobe({x:1.2, y:1.5, z:1.5}, {x:1, y:0, z:-3}, "Occipital Lobe (R)", "Visual processing center.");
-
-        // Cerebellum
         const cerebellum = createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Motor control, balance, coordination.");
         
-        // Brain Stem
         const stemGeo = new THREE.CylinderGeometry(0.8, 0.6, 4, 16);
-        const stem = new THREE.Mesh(stemGeo, sketchMaterial.clone());
+        const stem = new THREE.Mesh(stemGeo, matBrain.clone());
         stem.position.set(0, -3, 0);
         stem.rotation.x = 0.2;
-        stem.userData = { name: "Brain Stem", desc: "Basic life functions (breathing, heart rate)." };
+        stem.userData = { name: "Brain Stem", desc: "Basic life functions." };
 
         brainGroup.add(frontalL, frontalR, parietalL, parietalR, temporalL, temporalR, occipitalL, occipitalR, cerebellum, stem);
         scene.add(brainGroup);
 
-        // Interaction Logic
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const tooltip = document.getElementById('brain-tooltip');
@@ -337,21 +526,16 @@
             if (intersects.length > 0) {
                 const obj = intersects[0].object;
                 if (hoveredObj !== obj) {
-                    // Reset previous
-                    if (hoveredObj) hoveredObj.material = sketchMaterial;
-                    
-                    // Highlight new
+                    if (hoveredObj) hoveredObj.material = matBrain;
                     hoveredObj = obj;
-                    hoveredObj.material = highlightMaterial;
-                    
-                    // Update Tooltip
+                    hoveredObj.material = matHighlight;
                     ttTitle.innerText = hoveredObj.userData.name;
                     ttDesc.innerText = hoveredObj.userData.desc;
                     tooltip.style.display = 'block';
                 }
             } else {
                 if (hoveredObj) {
-                    hoveredObj.material = sketchMaterial;
+                    hoveredObj.material = matBrain;
                     hoveredObj = null;
                     tooltip.style.display = 'none';
                 }
@@ -362,44 +546,8 @@
 
         const animate = () => {
             requestAnimationFrame(animate);
-            // Scroll rotation
             brainGroup.rotation.y = window.scrollY * 0.002; 
             brainGroup.rotation.x = Math.sin(window.scrollY * 0.001) * 0.1;
-            
-            if(controls) controls.update();
-            renderer.render(scene, camera);
-        };
-        animate();
-    })();
-
-    // --- 3. ATP SCENE ---
-    (() => {
-        const { scene, camera, renderer, controls } = initScene('container-atp');
-        
-        const atpGroup = new THREE.Group();
-
-        // Stator (Cylinder)
-        const cylGeo = new THREE.CylinderGeometry(1.5, 1.5, 4, 32, 4, true);
-        const cyl = new THREE.Mesh(cylGeo, sketchMaterial);
-        
-        // Rotor (Turbine head - Torus)
-        const torusGeo = new THREE.TorusGeometry(2.5, 0.5, 16, 50);
-        const rotor = new THREE.Mesh(torusGeo, sketchMaterial);
-        rotor.rotation.x = Math.PI / 2;
-        rotor.position.y = 2;
-
-        atpGroup.add(cyl);
-        atpGroup.add(rotor);
-        scene.add(atpGroup);
-
-        const animate = () => {
-            requestAnimationFrame(animate);
-            // Mechanical rotation
-            rotor.rotation.z += 0.05;
-            // Scroll interaction
-            atpGroup.rotation.y = window.scrollY * 0.003;
-            atpGroup.rotation.z = 0.2; // Slight tilt
-            
             if(controls) controls.update();
             renderer.render(scene, camera);
         };
