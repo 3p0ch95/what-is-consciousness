@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Thought About A Thought</title>
+    <title>The Silicon Soul</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
@@ -178,7 +178,7 @@
         <h4 id="bt-title">Region</h4>
         <p id="bt-desc">Description</p>
     </div>
-    <div class="interaction-hint">Hover lobes to analyze • Drag to rotate</div>
+    <div class="interaction-hint">Hover lobes to analyze • Watch the data flow</div>
 </div>
 
 <div class="content-container">
@@ -217,13 +217,13 @@
     <p>Sometimes, knowing that one does not know is the most noble.</p>
 
     <footer>
-        &copy; 2/10/26 - Jesse Pardue
+        &copy; 2026 - Jesse Pardue
     </footer>
 </div>
 
 <script>
     // --- THREE.JS COMMON SETUP ---
-    const initScene = (containerId) => {
+    const initScene = (containerId, cameraZ = 15) => {
         const container = document.getElementById(containerId);
         const width = container.clientWidth;
         const height = container.clientHeight;
@@ -232,7 +232,7 @@
         scene.background = new THREE.Color(0xffffff);
 
         const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-        camera.position.z = 15;
+        camera.position.z = cameraZ;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(width, height);
@@ -243,7 +243,7 @@
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.enableZoom = false; // Zoom handled manually for specific scene
+            controls.enableZoom = false; 
         }
 
         window.addEventListener('resize', () => {
@@ -257,115 +257,84 @@
         return { scene, camera, renderer, controls, container };
     };
 
-    // --- MATERIALS (Wireframe + Color Splashes) ---
+    // --- MATERIALS ---
     const wireMat = (color, opacity = 0.3) => new THREE.MeshBasicMaterial({ 
         color: color, wireframe: true, transparent: true, opacity: opacity 
     });
     const solidMat = (color) => new THREE.MeshBasicMaterial({ color: color });
-    // Invisible hit material for interactions
     const hitMat = new THREE.MeshBasicMaterial({ visible: false });
 
-    // --- 1. THE UNIVERSAL SCALE SCENE ---
+    // --- 1. THE UNIVERSAL SCALE SCENE (Pea -> Galaxy) ---
     (() => {
-        const { scene, camera, renderer, controls, container } = initScene('container-scale');
+        const { scene, camera, renderer, controls, container } = initScene('container-scale', 15);
         
         // --- LAYERS ---
-        // 0: Quark, 1: Nucleus, 2: Atom, 3: Pea, 4: Earth, 5: Galaxy
         const layers = {};
         
-        // LEVEL 0: QUARK (RGB Vibrating)
+        // LEVEL 0: QUARK
         layers.quark = new THREE.Group();
         const qGeo = new THREE.IcosahedronGeometry(0.3, 1);
-        const q1 = new THREE.Mesh(qGeo, wireMat(0xff0000, 0.8)); // Red
-        const q2 = new THREE.Mesh(qGeo, wireMat(0x00ff00, 0.8)); // Green
-        const q3 = new THREE.Mesh(qGeo, wireMat(0x0000ff, 0.8)); // Blue
+        const q1 = new THREE.Mesh(qGeo, wireMat(0xff0000, 0.8));
+        const q2 = new THREE.Mesh(qGeo, wireMat(0x00ff00, 0.8));
+        const q3 = new THREE.Mesh(qGeo, wireMat(0x0000ff, 0.8));
         q1.position.set(0.5,0,0); q2.position.set(-0.4,0.4,0); q3.position.set(0,-0.5,0.2);
-        // String connections
         const strGeo = new THREE.TorusGeometry(1.5, 0.02, 3, 16);
-        const str = new THREE.Mesh(strGeo, wireMat(0x000000, 0.1));
-        layers.quark.add(q1, q2, q3, str);
+        layers.quark.add(q1, q2, q3, new THREE.Mesh(strGeo, wireMat(0x000000, 0.1)));
 
-        // LEVEL 1: NUCLEUS (Protons/Neutrons)
+        // LEVEL 1: NUCLEUS
         layers.nucleus = new THREE.Group();
         const nucBall = new THREE.SphereGeometry(0.6, 8, 8);
-        const matProt = wireMat(0xff3333, 0.6); // Redish
-        const matNeut = wireMat(0x3333ff, 0.6); // Bluish
         for(let i=0; i<10; i++) {
-            const ball = new THREE.Mesh(nucBall, i%2==0 ? matProt : matNeut);
+            const ball = new THREE.Mesh(nucBall, wireMat(i%2==0?0xff3333:0x3333ff, 0.6));
             ball.position.set((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5);
             layers.nucleus.add(ball);
         }
-        // Hit target
-        const nucHit = new THREE.Mesh(new THREE.SphereGeometry(2), hitMat);
-        layers.nucleus.add(nucHit);
+        layers.nucleus.add(new THREE.Mesh(new THREE.SphereGeometry(2), hitMat));
 
-        // LEVEL 2: ATOM (Electron Shells)
+        // LEVEL 2: ATOM
         layers.atom = new THREE.Group();
-        // Core
-        const atomCore = new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), wireMat(0x111111, 0.8));
-        layers.atom.add(atomCore);
-        // Shells
+        layers.atom.add(new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), wireMat(0x111111, 0.8)));
         const shellGeo = new THREE.TorusGeometry(5, 0.03, 3, 64);
-        const shellMat = wireMat(0x00ffff, 0.4); // Cyan
+        const shellMat = wireMat(0x00ffff, 0.4);
         const s1 = new THREE.Mesh(shellGeo, shellMat);
         const s2 = new THREE.Mesh(shellGeo, shellMat); s2.rotation.x = 1.5;
         const s3 = new THREE.Mesh(shellGeo, shellMat); s3.rotation.y = 1.5;
-        // Electrons
         const elec = new THREE.Mesh(new THREE.SphereGeometry(0.2,4,4), solidMat(0x00ffff));
         const e1 = elec.clone(); e1.position.x = 5; s1.add(e1);
         const e2 = elec.clone(); e2.position.x = 5; s2.add(e2);
         const e3 = elec.clone(); e3.position.x = 5; s3.add(e3);
-        layers.atom.add(s1, s2, s3);
-        // Hit target
-        const atomHit = new THREE.Mesh(new THREE.SphereGeometry(4), hitMat);
-        layers.atom.add(atomHit);
+        layers.atom.add(s1, s2, s3, new THREE.Mesh(new THREE.SphereGeometry(4), hitMat));
 
-
-        // LEVEL 3: PEA (Green, Start Point)
+        // LEVEL 3: PEA
         layers.pea = new THREE.Group();
-        const peaGeo = new THREE.IcosahedronGeometry(3, 2);
-        const peaMat = wireMat(0x2ecc71, 0.4); // Emerald Green
-        const peaOuter = new THREE.Mesh(peaGeo, peaMat);
-        const peaInner = new THREE.Mesh(new THREE.IcosahedronGeometry(2, 0), wireMat(0x27ae60, 0.8));
-        layers.pea.add(peaOuter, peaInner);
+        layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(3, 2), wireMat(0x2ecc71, 0.4)));
+        layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(2, 0), wireMat(0x27ae60, 0.8)));
 
-        // LEVEL 4: EARTH (Blue)
+        // LEVEL 4: EARTH
         layers.earth = new THREE.Group();
-        const earthGeo = new THREE.IcosahedronGeometry(4, 3);
-        const earthMat = wireMat(0x3498db, 0.3); // Blue
-        layers.earth.add(new THREE.Mesh(earthGeo, earthMat));
-        layers.earth.add(new THREE.Mesh(new THREE.IcosahedronGeometry(4.1, 1), wireMat(0xffffff, 0.1))); // Clouds
+        layers.earth.add(new THREE.Mesh(new THREE.IcosahedronGeometry(4, 3), wireMat(0x3498db, 0.3)));
 
-        // LEVEL 5: GALAXY (Purple Particles)
+        // LEVEL 5: GALAXY
         layers.galaxy = new THREE.Group();
         const starsGeo = new THREE.BufferGeometry();
         const starPos = [];
         for(let i=0; i<1500; i++) {
+            const r = i * 0.02; 
             const angle = i * 0.1;
-            const r = i * 0.02;
-            const x = Math.cos(angle) * r * 5;
-            const z = Math.sin(angle) * r * 5;
-            const y = (Math.random()-0.5) * r;
-            starPos.push(x, y, z);
+            starPos.push(Math.cos(angle)*r*5, (Math.random()-0.5)*r, Math.sin(angle)*r*5);
         }
         starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-        const stars = new THREE.Points(starsGeo, new THREE.PointsMaterial({color: 0x9b59b6, size: 0.15}));
-        layers.galaxy.add(stars);
-        // Galaxy Hit Target (Invisible sphere to ensure clicking works easily)
-        const galHit = new THREE.Mesh(new THREE.SphereGeometry(3), hitMat);
-        layers.galaxy.add(galHit);
+        layers.galaxy.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({color: 0x9b59b6, size: 0.15})));
+        layers.galaxy.add(new THREE.Mesh(new THREE.SphereGeometry(3), hitMat));
 
-        // Add all to scene
         Object.values(layers).forEach(g => scene.add(g));
 
-        // --- INTERACTION LOGIC ---
+        // Interaction
         const slider = document.getElementById('scale-slider');
         const label = document.getElementById('scale-text');
         const labels = ["THE QUARK", "THE NUCLEUS", "THE ATOM", "THE PEA", "PLANET EARTH", "THE GALAXY"];
-        
-        let targetVal = 3; // Start at Pea
-        
-        // Raycaster for clicking
+        let targetVal = 3; 
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -373,99 +342,46 @@
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            
             raycaster.setFromCamera(mouse, camera);
-            
-            // Check intersection with current visible layer
-            const currentIdx = Math.round(targetVal);
-            const currentGroup = Object.values(layers)[currentIdx];
-            
-            // We need recursive checking for children
-            const intersects = raycaster.intersectObjects(currentGroup.children, true);
-            
-            if (intersects.length > 0) {
-                // Clicked object -> Zoom In (lower index)
+            const currentGroup = Object.values(layers)[Math.round(targetVal)];
+            if (raycaster.intersectObjects(currentGroup.children, true).length > 0) {
                 if(targetVal > 0) targetVal = Math.floor(targetVal) - 1;
             } else {
-                // Clicked BG -> Zoom Out (higher index)
                 if(targetVal < 5) targetVal = Math.ceil(targetVal) + 1;
             }
             slider.value = targetVal;
         });
 
-        // Wheel Logic
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = Math.sign(e.deltaY); // +1 is down (Zoom Out)
-            targetVal += delta * 0.2;
+            targetVal += Math.sign(e.deltaY) * 0.2;
             targetVal = Math.max(0, Math.min(5, targetVal));
             slider.value = targetVal;
         }, {passive: false});
 
-        slider.addEventListener('input', (e) => {
-            targetVal = parseFloat(e.target.value);
-        });
-
-        const updateScene = () => {
-            // Smoothly display layers based on targetVal
-            const currentVal = parseFloat(slider.value);
-            
-            label.innerText = "SCALE: " + labels[Math.round(targetVal)];
-            
-            const layerKeys = ["quark", "nucleus", "atom", "pea", "earth", "galaxy"];
-            
-            layerKeys.forEach((key, idx) => {
-                const grp = layers[key];
-                const dist = idx - targetVal; 
-                
-                // Visibility window: +/- 1.5 units
-                if (Math.abs(dist) < 1.5) {
-                    grp.visible = true;
-                    
-                    // SCALE LOGIC: "Zooming In" means going from Index 3 -> 2.
-                    // If dist > 0 (idx > targetVal) -> Layer is larger than view (Background layer).
-                    // If dist < 0 (idx < targetVal) -> Layer is smaller than view (Inner layer).
-                    
-                    const scale = Math.pow(4, dist); 
-                    grp.scale.setScalar(scale);
-                    
-                    // OPACITY: Fade out as it gets too huge or too tiny
-                    let opacity = 1 - Math.abs(dist);
-                    opacity = Math.max(0, opacity);
-                    
-                    grp.children.forEach(c => {
-                        if(c.material) c.material.opacity = opacity * (c.userData.baseOp || 0.4);
-                        // Enhance brightness for active layer
-                        if(c.material && Math.abs(dist) < 0.2) c.material.opacity = 0.8; 
-                    });
-                    
-                } else {
-                    grp.visible = false;
-                }
-            });
-        };
+        slider.addEventListener('input', (e) => targetVal = parseFloat(e.target.value));
 
         const animate = () => {
             requestAnimationFrame(animate);
+            const curr = parseFloat(slider.value);
+            if(Math.abs(targetVal - curr) > 0.01) slider.value = curr + (targetVal - curr) * 0.1;
             
-            // Soft lerp of the slider value for animation
-            const currentSlider = parseFloat(slider.value);
-            if(Math.abs(targetVal - currentSlider) > 0.01) {
-                slider.value = currentSlider + (targetVal - currentSlider) * 0.1;
-                updateScene();
-            } else {
-                updateScene();
-            }
-
-            // Rotations
+            label.innerText = "SCALE: " + labels[Math.round(parseFloat(slider.value))];
             const t = Date.now() * 0.0005;
-            layers.quark.rotation.x = t*2;
-            layers.nucleus.rotation.y = -t;
-            layers.atom.rotation.z = t;
-            layers.atom.children.forEach((c,i) => { if(i>0) c.rotation.z += 0.02; }); // spin shells
-            layers.pea.rotation.y = t * 0.5;
-            layers.earth.rotation.y = t * 0.2;
-            layers.galaxy.rotation.y = t * 0.1;
+            
+            ["quark", "nucleus", "atom", "pea", "earth", "galaxy"].forEach((k, i) => {
+                const grp = layers[k];
+                const dist = i - parseFloat(slider.value);
+                if (Math.abs(dist) < 1.5) {
+                    grp.visible = true;
+                    grp.scale.setScalar(Math.pow(4, dist));
+                    let op = Math.max(0, 1 - Math.abs(dist));
+                    grp.children.forEach(c => { if(c.material) c.material.opacity = op * (c.userData.baseOp || 0.4); });
+                    // Rotations
+                    if(k==='atom') { grp.rotation.z = t; grp.children.forEach((c,j)=>j<3?c.rotation.z+=0.02:null); }
+                    else grp.rotation.y = t * (i%2===0 ? 0.5 : -0.5);
+                } else grp.visible = false;
+            });
 
             if(controls) controls.update();
             renderer.render(scene, camera);
@@ -473,13 +389,14 @@
         animate();
     })();
 
-    // --- 2. BRAIN SCENE (Unchanged) ---
+    // --- 2. BRAIN SCENE (Data Stream Particle System) ---
     (() => {
-        const { scene, camera, renderer, controls } = initScene('container-brain');
+        const { scene, camera, renderer, controls } = initScene('container-brain', 12);
         const brainGroup = new THREE.Group();
-        const matBrain = wireMat(0x111111, 0.15);
-        const matHighlight = wireMat(0x000000, 0.8);
+        const matBrain = wireMat(0x111111, 0.1);
+        const matHighlight = wireMat(0x000000, 0.6);
 
+        // Helper: Create Brain Geometry (Lobes)
         const createLobe = (scale, pos, name, desc) => {
             const geo = new THREE.SphereGeometry(1, 16, 16);
             const mesh = new THREE.Mesh(geo, matBrain.clone());
@@ -489,65 +406,170 @@
             return mesh;
         };
 
-        const frontalL = createLobe({x:1.5, y:2, z:2}, {x:-1.5, y:1, z:1}, "Frontal Lobe (L)", "Logic, planning, execution.");
-        const frontalR = createLobe({x:1.5, y:2, z:2}, {x:1.5, y:1, z:1}, "Frontal Lobe (R)", "Logic, planning, execution.");
-        const parietalL = createLobe({x:1.4, y:1.8, z:1.8}, {x:-1.6, y:2.5, z:-1.5}, "Parietal Lobe (L)", "Sensory processing, spatial awareness.");
-        const parietalR = createLobe({x:1.4, y:1.8, z:1.8}, {x:1.6, y:2.5, z:-1.5}, "Parietal Lobe (R)", "Sensory processing, spatial awareness.");
-        const temporalL = createLobe({x:1.2, y:1.5, z:2.2}, {x:-2.8, y:-1, z:0.5}, "Temporal Lobe (L)", "Auditory processing, memory encoding.");
-        const temporalR = createLobe({x:1.2, y:1.5, z:2.2}, {x:2.8, y:-1, z:0.5}, "Temporal Lobe (R)", "Auditory processing, memory encoding.");
-        const occipitalL = createLobe({x:1.2, y:1.5, z:1.5}, {x:-1, y:0, z:-3}, "Occipital Lobe (L)", "Visual processing center.");
-        const occipitalR = createLobe({x:1.2, y:1.5, z:1.5}, {x:1, y:0, z:-3}, "Occipital Lobe (R)", "Visual processing center.");
-        const cerebellum = createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Motor control, balance, coordination.");
+        const parts = [
+            createLobe({x:1.5, y:2, z:2}, {x:-1.5, y:1, z:1}, "Frontal Lobe (L)", "Logic & Planning"),
+            createLobe({x:1.5, y:2, z:2}, {x:1.5, y:1, z:1}, "Frontal Lobe (R)", "Logic & Planning"),
+            createLobe({x:1.4, y:1.8, z:1.8}, {x:-1.6, y:2.5, z:-1.5}, "Parietal Lobe (L)", "Sensation & Space"),
+            createLobe({x:1.4, y:1.8, z:1.8}, {x:1.6, y:2.5, z:-1.5}, "Parietal Lobe (R)", "Sensation & Space"),
+            createLobe({x:1.2, y:1.5, z:2.2}, {x:-2.8, y:-1, z:0.5}, "Temporal Lobe (L)", "Memory & Hearing"),
+            createLobe({x:1.2, y:1.5, z:2.2}, {x:2.8, y:-1, z:0.5}, "Temporal Lobe (R)", "Memory & Hearing"),
+            createLobe({x:1.2, y:1.5, z:1.5}, {x:-1, y:0, z:-3}, "Occipital Lobe (L)", "Vision"),
+            createLobe({x:1.2, y:1.5, z:1.5}, {x:1, y:0, z:-3}, "Occipital Lobe (R)", "Vision"),
+            createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Coordination"),
+        ];
         
-        const stemGeo = new THREE.CylinderGeometry(0.8, 0.6, 4, 16);
-        const stem = new THREE.Mesh(stemGeo, matBrain.clone());
-        stem.position.set(0, -3, 0);
-        stem.rotation.x = 0.2;
-        stem.userData = { name: "Brain Stem", desc: "Basic life functions." };
-
-        brainGroup.add(frontalL, frontalR, parietalL, parietalR, temporalL, temporalR, occipitalL, occipitalR, cerebellum, stem);
+        // Brain Stem
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.6, 4, 16), matBrain.clone());
+        stem.position.set(0, -3, 0); stem.rotation.x = 0.2;
+        stem.userData = { name: "Brain Stem", desc: "Basic Life Functions" };
+        parts.push(stem);
+        parts.forEach(p => brainGroup.add(p));
         scene.add(brainGroup);
 
+        // --- DATA PARTICLE SYSTEM (Instanced Cubes) ---
+        const PARTICLE_COUNT = 400;
+        const dummy = new THREE.Object3D();
+        const pGeo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
+        const pMat = new THREE.MeshBasicMaterial({ color: 0x222222 }); // Dark Grey Bits
+        const particleMesh = new THREE.InstancedMesh(pGeo, pMat, PARTICLE_COUNT);
+        particleMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        brainGroup.add(particleMesh); // Add to group so they rotate with brain
+
+        const particles = [];
+        
+        for(let i=0; i<PARTICLE_COUNT; i++) {
+            particles.push({
+                pos: new THREE.Vector3(),
+                target: new THREE.Vector3(),
+                state: 0, 
+                speed: 0.05 + Math.random() * 0.05,
+                phaseOffset: Math.random() * Math.PI * 2
+            });
+            respawnParticle(particles[i]);
+        }
+
+        function respawnParticle(p) {
+            // Random source: Eyes (Front), Ears (Sides), Stem (Bottom)
+            const r = Math.random();
+            if(r < 0.33) {
+                // Eyes (Front Z)
+                p.pos.set((Math.random()-0.5)*2, 0, 6);
+            } else if (r < 0.66) {
+                // Ears (Side X)
+                p.pos.set(r < 0.5 ? 6 : -6, (Math.random()-0.5)*2, 0);
+            } else {
+                // Stem (Bottom Y)
+                p.pos.set(0, -6, (Math.random()-0.5)*2);
+            }
+            p.state = 0; // Ingest
+            p.target.set(0, -1, 0); // Bottom of stream
+        }
+
+        function updateParticles() {
+            const time = Date.now() * 0.001;
+            
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const p = particles[i];
+
+                if(p.state === 0) { 
+                    // INGEST: Fly to center
+                    const dir = new THREE.Vector3().subVectors(p.target, p.pos);
+                    if(dir.length() < 0.5) {
+                        p.state = 1; // Enter stream
+                    } else {
+                        dir.normalize().multiplyScalar(p.speed * 3); // Fast ingest
+                        p.pos.add(dir);
+                    }
+                } 
+                else if (p.state === 1) {
+                    // STREAM: Spiral Up
+                    // Radius shrinks as it goes up
+                    p.pos.y += p.speed;
+                    const radius = 0.5 * (1 - (p.pos.y + 1)/3); // Taper
+                    p.pos.x = Math.cos(time * 5 + p.phaseOffset) * radius;
+                    p.pos.z = Math.sin(time * 5 + p.phaseOffset) * radius;
+
+                    if(p.pos.y > 1.5) {
+                        p.state = 2; // Spread
+                        // Pick random target inside brain volume
+                        const angle = Math.random() * Math.PI * 2;
+                        const r = 2 + Math.random();
+                        p.target.set(
+                            Math.cos(angle) * r,
+                            (Math.random()-0.5) * 2,
+                            Math.sin(angle) * r
+                        );
+                    }
+                }
+                else if (p.state === 2) {
+                    // SPREAD: Move to random target
+                    const dir = new THREE.Vector3().subVectors(p.target, p.pos);
+                    p.pos.add(dir.multiplyScalar(0.05));
+                    
+                    if(dir.length() < 0.1 || Math.random() < 0.01) {
+                        p.state = 3; // Vacuum
+                    }
+                }
+                else if (p.state === 3) {
+                    // VACUUM: Suck back to center
+                    const center = new THREE.Vector3(0,0,0);
+                    const dir = new THREE.Vector3().subVectors(center, p.pos);
+                    p.pos.add(dir.multiplyScalar(0.05));
+                    
+                    if(dir.length() < 0.5) {
+                        // Loop experience (Back to Stream) or Respawn (New Input)
+                        p.state = 1; 
+                        p.pos.set(0, -1, 0);
+                        if(Math.random() < 0.1) respawnParticle(p);
+                    }
+                }
+
+                // Apply to mesh
+                dummy.position.copy(p.pos);
+                // Rotate bits randomly
+                dummy.rotation.set(time+i, time+i, time); 
+                dummy.updateMatrix();
+                particleMesh.setMatrixAt(i, dummy.matrix);
+            }
+            particleMesh.instanceMatrix.needsUpdate = true;
+        }
+
+        // Interaction Logic (Tooltip)
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const tooltip = document.getElementById('brain-tooltip');
-        const ttTitle = document.getElementById('bt-title');
-        const ttDesc = document.getElementById('bt-desc');
         let hoveredObj = null;
 
-        const onMouseMove = (event) => {
+        document.getElementById('container-brain').addEventListener('mousemove', (e) => {
             const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(brainGroup.children);
-
-            if (intersects.length > 0) {
+            if (intersects.length > 0 && intersects[0].object.geometry.type !== 'BoxGeometry') {
                 const obj = intersects[0].object;
                 if (hoveredObj !== obj) {
                     if (hoveredObj) hoveredObj.material = matBrain;
                     hoveredObj = obj;
                     hoveredObj.material = matHighlight;
-                    ttTitle.innerText = hoveredObj.userData.name;
-                    ttDesc.innerText = hoveredObj.userData.desc;
+                    document.getElementById('bt-title').innerText = hoveredObj.userData.name;
+                    document.getElementById('bt-desc').innerText = hoveredObj.userData.desc;
                     tooltip.style.display = 'block';
                 }
             } else {
-                if (hoveredObj) {
-                    hoveredObj.material = matBrain;
-                    hoveredObj = null;
-                    tooltip.style.display = 'none';
-                }
+                if (hoveredObj) { hoveredObj.material = matBrain; hoveredObj = null; tooltip.style.display = 'none'; }
             }
-        };
+        });
 
-        document.getElementById('container-brain').addEventListener('mousemove', onMouseMove);
-
+        // Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
-            brainGroup.rotation.y = window.scrollY * 0.002; 
+            updateParticles();
+
+            // Group Rotation
+            brainGroup.rotation.y = window.scrollY * 0.002;
             brainGroup.rotation.x = Math.sin(window.scrollY * 0.001) * 0.1;
+            
             if(controls) controls.update();
             renderer.render(scene, camera);
         };
