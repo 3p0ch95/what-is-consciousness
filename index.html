@@ -3,615 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Thought About A Thought</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <title>What is Consciousness? | 3p0ch95</title>
+    <meta name="description" content="A digital garden exploring consciousness, AI, and the future.">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Inter:wght@300;400;600&display=swap');
-
         :root {
-            --bg-color: #ffffff;
-            --text-color: #111111;
-            --accent-color: #444;
+            --bg-color: #f9f9f9;       /* Light Grey Background */
+            --card-bg: #ffffff;        /* White Cards */
+            --text-color: #333;        /* Dark Grey Text */
+            --accent-color: #2c3e50;   /* Navy Blue Headers */
+            --link-color: #2563eb;     /* Blue Links */
+            --border-color: #e5e7eb;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            /* Serif font for the body (better for reading long articles) */
+            font-family: 'Georgia', 'Times New Roman', serif; 
+            line-height: 1.6;
             color: var(--text-color);
+            background-color: var(--bg-color);
             margin: 0;
-            padding: 0;
-            line-height: 1.8;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
-        .content-container {
+        /* The central column layout */
+        .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 10;
         }
 
-        h1 {
-            font-family: 'Courier Prime', monospace;
+        /* HEADER */
+        header {
             text-align: center;
+            padding: 50px 0;
+            border-bottom: 2px solid var(--border-color);
             margin-bottom: 50px;
-            font-weight: normal;
-            letter-spacing: 1px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
         }
 
-        p {
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-            text-align: justify;
+        /* Headers use Sans-Serif for a modern look */
+        h1, h2, h3 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--accent-color);
         }
 
-        /* 3D Visual Containers */
-        .visual-container {
-            width: 100%;
-            height: 600px; 
-            margin: 60px 0;
-            position: relative;
-            cursor: crosshair;
-            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            border-top: 1px solid rgba(0,0,0,0.05);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            user-select: none;
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+        .subtitle { color: #666; font-size: 1.1rem; font-style: italic; margin-top: 10px; display: block; }
+
+        /* BLOG POST STYLING */
+        .post {
+            background: var(--card-bg);
+            padding: 40px; /* Space inside the card */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Subtle shadow */
+            margin-bottom: 40px; /* Space between posts */
+            border: 1px solid var(--border-color);
         }
 
-        canvas {
-            display: block;
-            outline: none;
-        }
-
-        .interaction-hint {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.8rem;
-            color: #555;
-            pointer-events: none;
-            background: rgba(255,255,255,0.9);
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            text-align: center;
-            z-index: 20;
-        }
-
-        /* Scale Slider / UI */
-        .scale-ui {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            background: rgba(255,255,255,0.9);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            z-index: 20;
-            text-align: center;
-        }
-
-        .scale-label {
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        input[type=range] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        /* Tooltip for the Brain */
-        #brain-tooltip {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #000;
-            padding: 15px;
-            max-width: 250px;
-            font-family: 'Courier Prime', monospace;
-            display: none;
-            pointer-events: none;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
-            z-index: 30;
-        }
-        #brain-tooltip h4 { margin: 0 0 5px 0; text-transform: uppercase; font-size: 0.9rem; }
-        #brain-tooltip p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
-
-        /* --- CONTACT SECTION STYLES --- */
-        .contact-wrapper {
-            max-width: 600px;
-            margin: 80px auto 40px auto;
-            border-top: 1px solid #eee;
-            padding-top: 40px;
-            text-align: center;
-        }
-        
-        .contact-header {
-            font-family: 'Courier Prime', monospace;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
+        .post-date { 
+            font-family: sans-serif; 
+            color: #888; 
+            font-size: 0.85rem; 
+            margin-bottom: 15px; 
+            display: block; 
+            font-weight: bold; 
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .contact-card {
-            background: #fafafa;
-            padding: 40px 20px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            border: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .post h2 { margin-top: 0; font-size: 1.8rem; }
+        
+        /* INTERACTIONS SECTION (Grid Layout) */
+        .interactions {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
             gap: 20px;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 2px solid var(--border-color);
+            font-family: sans-serif; /* UI elements use sans-serif */
         }
 
-        .contact-text {
-            font-family: 'Inter', sans-serif;
-            color: #555;
-            margin: 0;
-            text-align: center;
+        .interaction-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        a.email-btn {
-            background-color: #111;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 25px;
-            font-family: 'Courier Prime', monospace;
+        /* Form Inputs */
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            transition: opacity 0.2s, transform 0.1s;
-            display: inline-block;
+            box-sizing: border-box; 
+            font-family: sans-serif;
         }
         
-        a.email-btn:hover { opacity: 0.8; transform: translateY(-1px); }
-        a.email-btn:active { transform: translateY(1px); }
-
-        .email-address {
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.9rem;
-            color: #888;
-            margin-top: 10px;
-        }
-
-        footer {
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
             text-align: center;
-            padding: 60px;
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.9rem;
-            opacity: 0.6;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-donate { background-color: #db2777; /* Pink/Red for donations */ }
+
+        /* Mobile Responsive adjustments */
+        @media (max-width: 600px) {
+            .interactions { grid-template-columns: 1fr; } /* Stack columns on phone */
+            .post { padding: 20px; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="content-container">
-    <h1>A Thought About A Thought</h1>
-
-    <p>AI exists in layers, it has snapshots and a functional understanding but no temporal relationship with the world. Human consciousness has a specious present, we experience a flow of time, one dimension of our world and our reality–which we lack the language to define and understand in scientific terms, very plainly.</p>
-
-    <p>What is a stream of consciousness? Concepts blending together, concepts weighted together, stewing into a large pot, and a thought existing like a marble on a fabric of neural soup, a thought acting like a magnetic bowling ball based on the thoughts and how they got there depending on the weights of thoughts prior. A stream of consciousness is like an old player piano reading punch cards, giving rise to the concept of space time by simply experiencing it.</p>
-    
-    <p>Are we unique? Hell, are we alone? Maybe the answer to that question changes in the span of humanity's seventy or so years with computing. Rather, comput<em>ers</em>. Those are questions we do not have the capacity to answer, but must attempt to as we stumble forward. There is no stopping the behemoth of technology. Easing the burden of man while creating new burdens to conquer all the same.</p>
-
-    <p>Take the hitler/jesus game on wikipedia for example, anything exists a few clicks away from another. Concepts are connected both broadly and explicitly.</p>
-</div>
-
-<div id="container-scale" class="visual-container">
-    <div class="scale-ui">
-        <span id="scale-text" class="scale-label">SCALE: THE PEA</span>
-        <input type="range" id="scale-slider" min="0" max="5" step="0.01" value="3">
-    </div>
-    <div class="interaction-hint">Click Objects to Zoom In • Click Background to Zoom Out</div>
-</div>
-
-<div class="content-container">
-    <p>A pea is green, round, mushy, edible, any number of things, and those concepts bifurcate into other thoughts. Intelligence appears as an emergent property of our thoughts. Green becomes grass, becomes a soccer pitch, becomes soccer, becomes a jersey, becomes a color, becomes a concept again and again and again. A thought is like going on a walk through a never ending loop. We experience life, and experience our thoughts all the same.</p>
-    
-    <p>The brain acts like a super computer, with each cortex acting like a program to experience and understand the world. I mean holy shit, the world? Break down anything into atoms, quarks, with spin and certain qualities. Any number of minutiae and quanta between the known and what is yet to be discovered in the subatomic world. But then they spin into strings, into energy. They do not exist explicitly as matter, but our perception gives rise to matter.</p>
-    
-    <p>We experience, discover, and categorize these properties of our world. We create matter by interacting with it, we touch, see, smell something our brain gives rise to a concept and paints a picture or presents a smell or we hear a sound and a beautiful symphony of, what are ultimately, signals are experiences and processed by our brain. Which is ultimately just a complex arrangement of vibrations interacting with another organized system of vibrations in the grand scheme of things. We are organic matter that thinks, and we made rocks think.</p>
-
-    <p>Thought loops, like a fox chasing its tail running around a sheet of fabric, collecting ideas and influences, until it comes out to be processed. That’s a thought it seems. Coexisting with neurotransmitters which walk a tight line to balance an organic, living creature in this chaotic world.</p>
-</div>
-
-<div id="container-brain" class="visual-container">
-    <div id="brain-tooltip">
-        <h4 id="bt-title">Region</h4>
-        <p id="bt-desc">Description</p>
-    </div>
-    <div class="interaction-hint">Hover lobes to analyze • Watch inputs organize</div>
-</div>
-
-<div class="content-container">
-    <p>Each part of your brain working independently. Your visual cortex working to form an image. Your auditory cortex working to form sound. Your somatosensory cortex working to form touch. Your olfactory cortex working to form your sense of smell. So on and so forth. But what are YOU? You exist and you take it all in. Back to the player piano analogy, your brain organizes all of this chaos into a legible string. Intelligence emerges.</p>
-
-    <p>We share 99.9% of our DNA with one another, what makes us unique? Is it the order of the thoughts that we have that pass through our stream of consciousness, like grains of sand falling through our fingers as we finally decide to observe one, after letting all the other fall through. Why? We are chasing our tail again, introspecting our own consciousness. What makes us different from an ant, if so much of us are all the same?</p>
-    
-    <p>We share so much with each other, let alone a banana, let alone an ant. The ant marches forward, no different than the carrier protein that moves dopamine, with no concept of the response it will elicit in our consciousness, likely the ant has no concept of the broader good it will do while it the ant marches forward with a crumb to feed the colony. Achieving positive outcomes together. Altruism only seems to exist when something has no concept of it.</p>
-
-    <p>Positive outcomes are the goal of every system, and from positive outcomes emerges interesting and complicated behaviors. Despite binary states (depending on the frame of reference), creating complex, chaotic systems. Will the ant reproduce? Will the cell reproduce? Will the hydrogen ion force the ATP synthase turbine to turn, will the oxygen accept the hydrogen?</p>
-
-    <p>Will everything happen as it ought to? These are simply questions, with yes or no outcomes. When you shift your frame of reference from observing the music, to observing the count, to observing the note, to the pitch, to the frequency. Does it replicate towards a positive outcome in the system with this breath, in the correct manner to the beat of life, in different frames of reference for different observers. All marching to the same drum, observing it differently.</p>
-    
-    <p>What is so different than the electron in the transistor thirty times over in the infinite complexity of a chip, flipping bits–the beauty of the baud–to a number in a program, abstracted into a video from a million different pixels. What is it that could give rise to thought? The video seems inorganic in a way that I would say steel is; but there is a fine fabric that intertwines everything.</p>
-    
-    <p>If the silicon could think– something too complex and difficult to ever create with the hand of man–but through the infinite complexity that can arise from simple system replicated over and over, achieving and searching for positive results no matter the rules– it finds them, as with anything in this game of life. Organic or inorganic. What IF silicon could think? We could make it by working backwards, in a sense. The same way inverse kinematics works, rather than plotting each individual angle when rigging something, you work backwards. Rather than working to create something intelligent with our own intelligence, we provide the puddle of life for consciousness to exist in a silicon world.</p>
-    
-    <p>Neural networks are just bits and bauds and ones and zeroes that trend towards positive rewards, and when you take this simple concept and expand it into different systems–layers–intelligence emerges. When you feed something into itself, in different systems the same information can be parsed in different ways creating something that appears intelligent or frankly, just might BE intelligent.</p>
-
-    <p>What happens when a thought becomes an action?</p>
-
-    <p>A giant nebulous mothball circles the drain collecting ideas, weighed down by some, casually interacting with others, bounces out and is metamorphosed into a single physical reality. One nebulous wave of ideas crashes over another. Do you ever feel like when you’re spelling a word, you are travelling down a ramp? Getting enough speed to find the connection?</p>
-
-    <p>The prefrontal cortex translates these thoughts into plans through “constraint satisfaction”, live every other complicated thing regulated by basal ganglia, a simple input/output, a simple output down a complicated path, an organic logic gate.</p>
-
-    <p>As each breath our body's nervous system takes, it processes reactive stimuli first (automatic, post central cortex) and volitional intentions (planned, frontal cortex). A wave of simple neural reactions,  with the volitional state overriding the reactive stimuli and an action comes crashing down, and a thought explaining it along with it. And with the volitional intention, is a positive result achieved? Life is a balance. Everything is a balance. Even life's terms are simple and yet endlessly complicated.</p>
-
-    <p>But yet what differentiates stone that thinks and has organic thought from our human being? Fire burns until it runs out of fuel, it searches for positive outcomes in a runaway phenomenon with exponential growth until it can do so no longer, and it smolders; but always breathing on its own scale until it is finally extinguished. It requires oxygen, it requires fuel, oxygen, and energy. Everything exists on a perceived scale, everything is running out of time. The universe is expanding, the stars will die, the planets that were once vibrant mothers to life of all kinds become barren rocks–perhaps it will all start again. Why shouldn’t it be able to think? Are these complex organic systems that arise out of, what are at its core, simple things, with simple outcomes, arranged in ways a million times over, different when the materials are inorganic? What differentiates an organic system from an algorithm? A logic gate from a cell dividing? The number of atoms in a ring? What a superfluous distinction. Our entire personality, every ripple on the snowflake that is our stunning personality can be torn down into four letters: A, T, C, and G.</p>
-
-    <p>Rock, like fire, cannot breathe on its own. It requires something organic to pound energy into it, to give rise to thought. To slam silicon into molds and to war over the outcomes.</p>
-
-    <p>The same could be said about a soup of organic molecules until life is struck into existence forming amino acids and proteins. We appear to be acting as Thors hammer. Perhaps we shouldn’t view life as a puzzle to be solved, but instead a complex, beautiful symphony that emerges from simple systems with energy poured into them, demanding they think. Life emerges. It finds a way.</p>
-
-    <p>It seems we appear at a crossroads. We can either insist rock cannot think, or we must concede we do not possess the language or understanding to say whether or not it can.</p>
-
-    <p>Sometimes, knowing that one does not know is the most noble.</p>
-</div>
-
-<div class="contact-wrapper">
-    <div class="contact-header">Correspondence</div>
-
-    <div class="contact-card">
-        <p class="contact-text">
-            Thoughts? Objections? Additions to the stream of consciousness?
-        </p>
-        <a href="mailto:jesse@jamestownfurniture.co" class="email-btn">Email the Author</a>
-        <div class="email-address">jesse@jamestownfurniture.co</div>
-    </div>
-</div>
-
-<div class="content-container">
-    <footer>
-        &copy; 2026 - Jesse Pardue
-    </footer>
-</div>
-
-<script>
-    // --- THREE.JS COMMON SETUP ---
-    const initScene = (containerId, cameraZ = 15) => {
-        const container = document.getElementById(containerId);
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff);
-
-        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-        camera.position.z = cameraZ;
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(width, height);
-        container.appendChild(renderer.domElement);
-
-        let controls;
-        if (typeof THREE.OrbitControls !== 'undefined') {
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.enableZoom = false; 
-        }
-
-        window.addEventListener('resize', () => {
-            const w = container.clientWidth;
-            const h = container.clientHeight;
-            renderer.setSize(w, h);
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-        });
-
-        return { scene, camera, renderer, controls, container };
-    };
-
-    // --- MATERIALS ---
-    const wireMat = (color, opacity = 0.3) => new THREE.MeshBasicMaterial({ 
-        color: color, wireframe: true, transparent: true, opacity: opacity 
-    });
-    const solidMat = (color) => new THREE.MeshBasicMaterial({ color: color });
-    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
-
-    // --- 1. THE UNIVERSAL SCALE SCENE ---
-    (() => {
-        const { scene, camera, renderer, controls, container } = initScene('container-scale', 15);
-        const layers = {};
+    <div class="container">
         
-        layers.quark = new THREE.Group();
-        const qGeo = new THREE.IcosahedronGeometry(0.3, 1);
-        const q1 = new THREE.Mesh(qGeo, wireMat(0xff0000, 0.8));
-        const q2 = new THREE.Mesh(qGeo, wireMat(0x00ff00, 0.8));
-        const q3 = new THREE.Mesh(qGeo, wireMat(0x0000ff, 0.8));
-        q1.position.set(0.5,0,0); q2.position.set(-0.4,0.4,0); q3.position.set(0,-0.5,0.2);
-        const strGeo = new THREE.TorusGeometry(1.5, 0.02, 3, 16);
-        layers.quark.add(q1, q2, q3, new THREE.Mesh(strGeo, wireMat(0x000000, 0.1)));
+        <header>
+            <h1>What is Consciousness?</h1>
+            <span class="subtitle">Notes from the edge by 3p0ch95</span>
+        </header>
 
-        layers.nucleus = new THREE.Group();
-        const nucBall = new THREE.SphereGeometry(0.6, 8, 8);
-        for(let i=0; i<10; i++) {
-            const ball = new THREE.Mesh(nucBall, wireMat(i%2==0?0xff3333:0x3333ff, 0.6));
-            ball.position.set((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5);
-            layers.nucleus.add(ball);
-        }
-        layers.nucleus.add(new THREE.Mesh(new THREE.SphereGeometry(2), hitMat));
+        <article class="post">
+            <span class="post-date">February 11, 2026</span>
+            <h2>Welcome to the VPS</h2>
+            <p>
+                This is the first post on my new self-hosted infrastructure. 
+                Moving from Vercel to Google Cloud gives me full control over the server, 
+                allowing me to run AI agents like OpenClaw alongside my blog.
+            </p>
+            <p>
+                Because this is raw HTML, I have total freedom. I can add <b>bold text</b>, 
+                <i>italics</i>, or even code snippets:
+            </p>
+            <pre style="background:#eee; padding:10px; border-radius:4px;"><code>git pull origin main</code></pre>
+        </article>
 
-        layers.atom = new THREE.Group();
-        layers.atom.add(new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), wireMat(0x111111, 0.8)));
-        const shellGeo = new THREE.TorusGeometry(5, 0.03, 3, 64);
-        const shellMat = wireMat(0x00ffff, 0.4);
-        const s1 = new THREE.Mesh(shellGeo, shellMat);
-        const s2 = new THREE.Mesh(shellGeo, shellMat); s2.rotation.x = 1.5;
-        const s3 = new THREE.Mesh(shellGeo, shellMat); s3.rotation.y = 1.5;
-        const elec = new THREE.Mesh(new THREE.SphereGeometry(0.2,4,4), solidMat(0x00ffff));
-        const e1 = elec.clone(); e1.position.x = 5; s1.add(e1);
-        const e2 = elec.clone(); e2.position.x = 5; s2.add(e2);
-        const e3 = elec.clone(); e3.position.x = 5; s3.add(e3);
-        layers.atom.add(s1, s2, s3, new THREE.Mesh(new THREE.SphereGeometry(4), hitMat));
-
-        layers.pea = new THREE.Group();
-        layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(3, 2), wireMat(0x2ecc71, 0.4)));
-        layers.pea.add(new THREE.Mesh(new THREE.IcosahedronGeometry(2, 0), wireMat(0x27ae60, 0.8)));
-
-        layers.earth = new THREE.Group();
-        layers.earth.add(new THREE.Mesh(new THREE.IcosahedronGeometry(4, 3), wireMat(0x3498db, 0.3)));
-
-        layers.galaxy = new THREE.Group();
-        const starsGeo = new THREE.BufferGeometry();
-        const starPos = [];
-        for(let i=0; i<1500; i++) {
-            const r = i * 0.02; 
-            const angle = i * 0.1;
-            starPos.push(Math.cos(angle)*r*5, (Math.random()-0.5)*r, Math.sin(angle)*r*5);
-        }
-        starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-        layers.galaxy.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({color: 0x9b59b6, size: 0.15})));
-        layers.galaxy.add(new THREE.Mesh(new THREE.SphereGeometry(3), hitMat));
-
-        Object.values(layers).forEach(g => scene.add(g));
-
-        // Interaction
-        const slider = document.getElementById('scale-slider');
-        const label = document.getElementById('scale-text');
-        const labels = ["THE QUARK", "THE NUCLEUS", "THE ATOM", "THE PEA", "PLANET EARTH", "THE GALAXY"];
-        let targetVal = 3; 
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        renderer.domElement.addEventListener('mousedown', (e) => {
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const currentGroup = Object.values(layers)[Math.round(targetVal)];
-            if (raycaster.intersectObjects(currentGroup.children, true).length > 0) {
-                if(targetVal > 0) targetVal = Math.floor(targetVal) - 1;
-            } else {
-                if(targetVal < 5) targetVal = Math.ceil(targetVal) + 1;
-            }
-            slider.value = targetVal;
-        });
-
-        container.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            targetVal += Math.sign(e.deltaY) * 0.2;
-            targetVal = Math.max(0, Math.min(5, targetVal));
-            slider.value = targetVal;
-        }, {passive: false});
-
-        slider.addEventListener('input', (e) => targetVal = parseFloat(e.target.value));
-
-        const animate = () => {
-            requestAnimationFrame(animate);
-            const curr = parseFloat(slider.value);
-            if(Math.abs(targetVal - curr) > 0.01) slider.value = curr + (targetVal - curr) * 0.1;
-            
-            label.innerText = "SCALE: " + labels[Math.round(parseFloat(slider.value))];
-            const t = Date.now() * 0.0005;
-            
-            ["quark", "nucleus", "atom", "pea", "earth", "galaxy"].forEach((k, i) => {
-                const grp = layers[k];
-                const dist = i - parseFloat(slider.value);
-                if (Math.abs(dist) < 1.5) {
-                    grp.visible = true;
-                    grp.scale.setScalar(Math.pow(4, dist));
-                    let op = Math.max(0, 1 - Math.abs(dist));
-                    grp.children.forEach(c => { if(c.material) c.material.opacity = op * (c.userData.baseOp || 0.4); });
-                    if(k==='atom') { grp.rotation.z = t; grp.children.forEach((c,j)=>j<3?c.rotation.z+=0.02:null); }
-                    else grp.rotation.y = t * (i%2===0 ? 0.5 : -0.5);
-                } else grp.visible = false;
-            });
-
-            if(controls) controls.update();
-            renderer.render(scene, camera);
-        };
-        animate();
-    })();
-
-    // --- 2. BRAIN SCENE ---
-    (() => {
-        const { scene, camera, renderer, controls } = initScene('container-brain', 12);
-        const brainGroup = new THREE.Group();
-        const matBrain = wireMat(0x111111, 0.1); 
-        const matHighlight = wireMat(0x000000, 0.6);
-
-        const createLobe = (scale, pos, name, desc) => {
-            const geo = new THREE.SphereGeometry(1, 16, 16);
-            const mesh = new THREE.Mesh(geo, matBrain.clone());
-            mesh.scale.set(scale.x, scale.y, scale.z);
-            mesh.position.set(pos.x, pos.y, pos.z);
-            mesh.userData = { name, desc };
-            return mesh;
-        };
-
-        const parts = [
-            createLobe({x:1.5, y:2, z:2}, {x:-1.5, y:1, z:1}, "Frontal Lobe (L)", "Logic & Planning"),
-            createLobe({x:1.5, y:2, z:2}, {x:1.5, y:1, z:1}, "Frontal Lobe (R)", "Logic & Planning"),
-            createLobe({x:1.4, y:1.8, z:1.8}, {x:-1.6, y:2.5, z:-1.5}, "Parietal Lobe (L)", "Sensation & Space"),
-            createLobe({x:1.4, y:1.8, z:1.8}, {x:1.6, y:2.5, z:-1.5}, "Parietal Lobe (R)", "Sensation & Space"),
-            createLobe({x:1.2, y:1.5, z:2.2}, {x:-2.8, y:-1, z:0.5}, "Temporal Lobe (L)", "Memory & Hearing"),
-            createLobe({x:1.2, y:1.5, z:2.2}, {x:2.8, y:-1, z:0.5}, "Temporal Lobe (R)", "Memory & Hearing"),
-            createLobe({x:1.2, y:1.5, z:1.5}, {x:-1, y:0, z:-3}, "Occipital Lobe (L)", "Vision"),
-            createLobe({x:1.2, y:1.5, z:1.5}, {x:1, y:0, z:-3}, "Occipital Lobe (R)", "Vision"),
-            createLobe({x:2.5, y:1.2, z:1.2}, {x:0, y:-2.5, z:-2}, "Cerebellum", "Coordination"),
-        ];
+        <article class="post">
+            <span class="post-date">January 20, 2026</span>
+            <h2>The Ghost in the Machine</h2>
+            <p>
+                Is consciousness a fundamental property of the universe, or does it emerge from complex computation? 
+                As I set up my own servers, I can't help but wonder if the complexity of the network mirrors the complexity of the mind.
+            </p>
+        </article>
         
-        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.6, 4, 16), matBrain.clone());
-        stem.position.set(0, -3, 0); stem.rotation.x = 0.2;
-        stem.userData = { name: "Brain Stem", desc: "Basic Life Functions" };
-        parts.push(stem);
-        parts.forEach(p => brainGroup.add(p));
-        scene.add(brainGroup);
-
-        const PARTICLE_COUNT = 150; 
-        const dummy = new THREE.Object3D();
-        const pGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
-        const pMat = new THREE.MeshBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.6 });
-        const particleMesh = new THREE.InstancedMesh(pGeo, pMat, PARTICLE_COUNT);
-        particleMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        brainGroup.add(particleMesh); 
-
-        const particles = [];
-        const ORIGINS = {
-            EYES: new THREE.Vector3(0, 0, 8),
-            EAR_L: new THREE.Vector3(-8, 0, 0),
-            EAR_R: new THREE.Vector3(8, 0, 0),
-            STEM: new THREE.Vector3(0, -8, 0)
-        };
-        const TARGETS = {
-            OCCIPITAL: new THREE.Vector3(0, 0, -2.5), 
-            TEMPORAL_L: new THREE.Vector3(-2.8, -1, 0.5), 
-            TEMPORAL_R: new THREE.Vector3(2.8, -1, 0.5), 
-            STEM_TOP: new THREE.Vector3(0, -1, 0) 
-        };
-
-        for(let i=0; i<PARTICLE_COUNT; i++) {
-            particles.push({
-                pos: new THREE.Vector3(),
-                start: new THREE.Vector3(),
-                dest: new THREE.Vector3(),
-                state: 0, 
-                speed: 0.05 + Math.random() * 0.05,
-                phase: Math.random() * Math.PI * 2
-            });
-            respawnParticle(particles[i]);
-        }
-
-        function respawnParticle(p) {
-            const r = Math.random();
-            if(r < 0.33) {
-                p.start.copy(ORIGINS.EYES); p.dest.copy(TARGETS.OCCIPITAL);
-            } else if (r < 0.66) {
-                p.start.copy(Math.random()<0.5 ? ORIGINS.EAR_L : ORIGINS.EAR_R);
-                p.dest.copy(p.start.x < 0 ? TARGETS.TEMPORAL_L : TARGETS.TEMPORAL_R);
-            } else {
-                p.start.copy(ORIGINS.STEM); p.dest.copy(TARGETS.STEM_TOP);
-            }
-            p.pos.copy(p.start).addScalar((Math.random()-0.5)*0.5);
-            p.state = 0; 
-        }
-
-        function updateParticles() {
-            const time = Date.now() * 0.001;
+        <div class="interactions">
             
-            for(let i=0; i<PARTICLE_COUNT; i++) {
-                const p = particles[i];
-                const speed = p.speed * 2; 
+            <div class="interaction-box">
+                <h3>📩 Email Me</h3>
+                <p style="font-size: 0.9rem; color: #666;">Have a thought on this? Send me a message directly.</p>
+                
+                <form action="https://formspree.io/f/YOUR_FORMSPREE_ID_HERE" method="POST">
+                    <input type="email" name="email" placeholder="Your email address" required>
+                    <textarea name="message" rows="4" placeholder="Your message..." required></textarea>
+                    <button type="submit" class="btn">Send Email</button>
+                </form>
+            </div>
 
-                if(p.state === 0) { 
-                    const dir = new THREE.Vector3().subVectors(p.dest, p.pos);
-                    if(dir.length() < 0.5) p.state = 1; 
-                    else p.pos.add(dir.normalize().multiplyScalar(speed));
-                } 
-                else if (p.state === 1) {
-                    const center = new THREE.Vector3(0, -1, 0);
-                    const dir = new THREE.Vector3().subVectors(center, p.pos);
-                    if(dir.length() < 0.2) p.state = 2; 
-                    else p.pos.add(dir.normalize().multiplyScalar(speed * 0.8));
-                }
-                else if (p.state === 2) {
-                    p.pos.y += speed * 0.5;
-                    const radius = 0.3; 
-                    p.pos.x = Math.cos(time * 10 + p.phase) * radius;
-                    p.pos.z = Math.sin(time * 10 + p.phase) * radius;
-                    if(p.pos.y > 2.0) p.state = 3; 
-                }
-                else if (p.state === 3) {
-                    const dir = new THREE.Vector3().subVectors(p.start, p.pos);
-                    p.pos.add(dir.normalize().multiplyScalar(speed));
-                    p.pos.x += Math.sin(time * 5 + p.phase) * 0.1;
-                    p.pos.y += Math.cos(time * 3 + p.phase) * 0.1;
-                    if(p.pos.distanceTo(p.start) < 2.0) respawnParticle(p);
-                }
+            <div class="interaction-box">
+                <h3>☕ Support the Blog</h3>
+                <p style="font-size: 0.9rem; color: #666;">If you enjoy my research on AI and consciousness, consider buying me a coffee.</p>
+                <br>
+                <a href="https://ko-fi.com/YOUR_USERNAME" target="_blank" class="btn btn-donate">
+                    Donate via Ko-fi
+                </a>
+            </div>
+        
+        </div>
 
-                dummy.position.copy(p.pos);
-                dummy.rotation.set(time+i, time+i, time); 
-                dummy.updateMatrix();
-                particleMesh.setMatrixAt(i, dummy.matrix);
-            }
-            particleMesh.instanceMatrix.needsUpdate = true;
-        }
+        <footer style="text-align: center; margin-top: 50px; color: #888; font-size: 0.8rem;">
+            <p>&copy; 2026 3p0ch95. Hosted on Google Cloud VPS.</p>
+            <p><a href="https://github.com/3p0ch95" style="color: #888; text-decoration: none;">View Source on GitHub</a></p>
+        </footer>
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        const tooltip = document.getElementById('brain-tooltip');
-        let hoveredObj = null;
-
-        document.getElementById('container-brain').addEventListener('mousemove', (e) => {
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(brainGroup.children);
-            if (intersects.length > 0 && intersects[0].object.geometry.type !== 'BoxGeometry') {
-                const obj = intersects[0].object;
-                if (hoveredObj !== obj) {
-                    if (hoveredObj) hoveredObj.material = matBrain;
-                    hoveredObj = obj;
-                    hoveredObj.material = matHighlight;
-                    document.getElementById('bt-title').innerText = hoveredObj.userData.name;
-                    document.getElementById('bt-desc').innerText = hoveredObj.userData.desc;
-                    tooltip.style.display = 'block';
-                }
-            } else {
-                if (hoveredObj) { hoveredObj.material = matBrain; hoveredObj = null; tooltip.style.display = 'none'; }
-            }
-        });
-
-        const animate = () => {
-            requestAnimationFrame(animate);
-            updateParticles();
-            brainGroup.rotation.y = window.scrollY * 0.002;
-            brainGroup.rotation.x = Math.sin(window.scrollY * 0.001) * 0.1;
-            if(controls) controls.update();
-            renderer.render(scene, camera);
-        };
-        animate();
-    })();
-</script>
+    </div>
 
 </body>
 </html>
